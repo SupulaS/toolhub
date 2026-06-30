@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bench — Tool Hub</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --ink:#16140f;
+    --paper:#e9e3d4;
+    --paper-2:#ddd5c2;
+    --line:#bcb29a;
+    --rust:#b1471f;
+    --rust-deep:#8a3414;
+    --moss:#4f5d3a;
+    --grid:#cfc6b0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Courier New",ui-monospace,monospace;
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:28px 28px;
+    min-height:100vh;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+
+  /* Masthead */
+  header{
+    border:2px solid var(--ink);
+    background:var(--paper-2);
+    padding:18px 20px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    font-family:Georgia,"Times New Roman",serif;
+    font-weight:700;
+    font-size:34px;
+    letter-spacing:-.5px;
+  }
+  .brand b{color:var(--rust)}
+  .tagline{
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--moss);
+  }
+
+  /* Tool index */
+  .index{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .tab{
+    border:1.5px solid var(--ink);
+    background:transparent;
+    padding:8px 14px;
+    font-family:"Courier New",monospace;
+    font-size:13px;
+    cursor:pointer;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    transition:background .12s,color .12s;
+  }
+  .tab .no{color:var(--rust);font-weight:700}
+  .tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+  .tab[aria-selected="true"] .no{color:var(--paper-2)}
+  .tab[disabled]{opacity:.45;cursor:not-allowed}
+
+  /* Panel */
+  .panel{
+    margin-top:22px;
+    border:2px solid var(--ink);
+    background:var(--paper-2);
+  }
+  .panel-head{
+    border-bottom:1.5px solid var(--ink);
+    padding:14px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .panel-head h2{
+    font-family:Georgia,serif;
+    font-size:22px;
+    font-weight:700;
+  }
+  .panel-head .meta{font-size:12px;color:var(--moss);letter-spacing:1px}
+  .panel-body{padding:20px}
+
+  /* Controls row */
+  .controls{
+    display:flex;
+    gap:18px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .ctrl{display:flex;flex-direction:column;gap:6px;font-size:12px}
+  .ctrl label{letter-spacing:1px;text-transform:uppercase;color:var(--moss)}
+  select,input[type=range]{
+    font-family:inherit;
+    accent-color:var(--rust);
+  }
+  select{
+    border:1.5px solid var(--ink);
+    background:var(--paper);
+    padding:6px 8px;
+    font-size:13px;
+  }
+  .qual{display:flex;align-items:center;gap:10px}
+  .qual output{font-weight:700;color:var(--rust);min-width:34px;text-align:right}
+
+  /* Dropzone */
+  .drop{
+    border:2px dashed var(--line);
+    background:var(--paper);
+    padding:38px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s,background .15s;
+  }
+  .drop:hover,.drop.over{border-color:var(--rust);background:#efe9da}
+  .drop .big{font-family:Georgia,serif;font-size:18px;margin-bottom:6px}
+  .drop .sub{font-size:12px;color:var(--moss)}
+  .drop .cap{margin-top:10px;font-size:11px;letter-spacing:1px}
+  .drop .cap b{color:var(--rust)}
+
+  /* Queue */
+  .queue{margin-top:18px;display:none}
+  .qhead{
+    display:flex;justify-content:space-between;align-items:center;
+    border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:12px;
+    font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:12px;
+  }
+  .card{
+    border:1.5px solid var(--ink);
+    background:var(--paper);
+    overflow:hidden;
+    position:relative;
+  }
+  .thumb{height:84px;background:#cfc6b0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .info{padding:6px 8px;font-size:11px;line-height:1.45}
+  .card .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card .size{color:var(--moss)}
+  .card .size .arr{color:var(--rust)}
+  .card .x{
+    position:absolute;top:4px;right:4px;
+    width:20px;height:20px;border:1px solid var(--ink);
+    background:var(--paper);font-size:12px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .card .x:hover{background:var(--rust);color:var(--paper)}
+  .badge{position:absolute;top:4px;left:4px;background:var(--moss);color:var(--paper);font-size:9px;padding:2px 5px;letter-spacing:1px}
+
+  /* Actions */
+  .actions{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  button.go{
+    font-family:"Courier New",monospace;
+    font-size:14px;letter-spacing:1px;text-transform:uppercase;
+    border:2px solid var(--ink);
+    background:var(--rust);color:var(--paper);
+    padding:11px 22px;cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);
+    transition:transform .08s,box-shadow .08s,background .12s;
+  }
+  button.go:hover{background:var(--rust-deep)}
+  button.go:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+  button.go:disabled{background:var(--line);cursor:not-allowed;box-shadow:3px 3px 0 var(--line);color:var(--paper-2)}
+  button.ghost{
+    font-family:"Courier New",monospace;font-size:13px;
+    border:1.5px solid var(--ink);background:transparent;
+    padding:10px 16px;cursor:pointer;
+  }
+  button.ghost:hover{background:var(--ink);color:var(--paper)}
+  .stat{font-size:12px;color:var(--moss);letter-spacing:1px}
+  .stat b{color:var(--rust)}
+
+  .soon{font-size:13px;color:var(--moss);padding:30px 0;text-align:center;line-height:1.7}
+  footer{margin-top:30px;font-size:11px;color:var(--moss);letter-spacing:1px;text-align:center}
+  @media(max-width:520px){.brand{font-size:26px}.panel-head h2{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">The <b>Bench</b></div>
+      <div class="tagline">A workshop of small tools</div>
+    </div>
+    <div class="tagline">No&nbsp;upload · runs&nbsp;in&nbsp;your&nbsp;browser</div>
+  </header>
+
+  <nav class="index" role="tablist" aria-label="Tools">
+    <button class="tab" role="tab" aria-selected="true" data-tool="img"><span class="no">01</span> Image → WebP</button>
+    <button class="tab" role="tab" aria-selected="false" disabled><span class="no">02</span> Next tool…</button>
+  </nav>
+
+  <section class="panel" id="tool-img">
+    <div class="panel-head">
+      <h2>Image to WebP</h2>
+      <div class="meta">PNG · JPG · GIF → WEBP</div>
+    </div>
+    <div class="panel-body">
+      <div class="controls">
+        <div class="ctrl">
+          <label for="fmt">Output</label>
+          <select id="fmt">
+            <option value="image/webp" selected>WebP</option>
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/png">PNG</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label for="q">Quality</label>
+          <div class="qual">
+            <input type="range" id="q" min="10" max="100" value="80" step="5">
+            <output id="qv">80</output>
+          </div>
+        </div>
+      </div>
+
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Add images">
+        <div class="big">Drop images here</div>
+        <div class="sub">or click / tap to choose files</div>
+        <div class="cap">Up to <b>30</b> images per batch · downloaded as one <b>.zip</b></div>
+        <input type="file" id="file" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" multiple hidden>
+      </div>
+
+      <div class="queue" id="queue">
+        <div class="qhead">
+          <span>Queue · <span id="count">0</span>/30</span>
+          <button class="ghost" id="clear">Clear all</button>
+        </div>
+        <div class="grid" id="grid"></div>
+      </div>
+
+      <div class="actions">
+        <button class="go" id="convert" disabled>Convert &amp; download .zip</button>
+        <span class="stat" id="stat"></span>
+      </div>
+    </div>
+  </section>
+
+  <footer>Files never leave your device — everything is processed locally.</footer>
+</div>
+
+<script>
+const MAX = 30;
+const fileInput = document.getElementById('file');
+const drop = document.getElementById('drop');
+const grid = document.getElementById('grid');
+const queue = document.getElementById('queue');
+const countEl = document.getElementById('count');
+const convertBtn = document.getElementById('convert');
+const clearBtn = document.getElementById('clear');
+const statEl = document.getElementById('stat');
+const fmtSel = document.getElementById('fmt');
+const qSlider = document.getElementById('q');
+const qOut = document.getElementById('qv');
+
+let items = []; // {id, file, url}
+let uid = 0;
+
+qSlider.addEventListener('input', () => qOut.textContent = qSlider.value);
+
+const fmtBytes = b => b < 1024 ? b+' B' : b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(2)+' MB';
+const extFor = m => ({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'})[m] || 'img';
+
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();} });
+fileInput.addEventListener('change', e => addFiles(e.target.files));
+
+['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
+
+function addFiles(list){
+  const incoming = [...list].filter(f => f.type.startsWith('image/'));
+  let added = 0, skipped = 0;
+  for(const f of incoming){
+    if(items.length >= MAX){ skipped++; continue; }
+    const id = ++uid;
+    const url = URL.createObjectURL(f);
+    items.push({id, file:f, url});
+    added++;
+  }
+  render();
+  if(skipped > 0) flash(`Added ${added}. Limit is ${MAX} — ${skipped} not added.`);
+  else if(added) flash(`Added ${added} image${added>1?'s':''}.`);
+  fileInput.value = '';
+}
+
+function removeItem(id){
+  const it = items.find(i=>i.id===id);
+  if(it) URL.revokeObjectURL(it.url);
+  items = items.filter(i=>i.id!==id);
+  render();
+}
+
+clearBtn.addEventListener('click', () => {
+  items.forEach(i => URL.revokeObjectURL(i.url));
+  items = []; render(); flash('');
+});
+
+function render(){
+  countEl.textContent = items.length;
+  queue.style.display = items.length ? 'block' : 'none';
+  convertBtn.disabled = items.length === 0;
+  grid.innerHTML = '';
+  for(const it of items){
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="thumb"><img src="${it.url}" alt=""></div>
+      <div class="x" title="Remove">✕</div>
+      <div class="info">
+        <div class="name">${it.file.name}</div>
+        <div class="size">${fmtBytes(it.file.size)}</div>
+      </div>`;
+    card.querySelector('.x').addEventListener('click', () => removeItem(it.id));
+    grid.appendChild(card);
+  }
+}
+
+function flash(msg){ statEl.innerHTML = msg; }
+
+function convertOne(file, type, quality){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const ctx = c.getContext('2d');
+      if(type === 'image/jpeg'){ ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height); }
+      ctx.drawImage(img,0,0);
+      c.toBlob(b => b ? resolve(b) : reject(new Error('encode failed')), type, quality);
+    };
+    img.onerror = () => reject(new Error('decode failed'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+convertBtn.addEventListener('click', async () => {
+  if(!items.length) return;
+  const type = fmtSel.value;
+  const quality = parseInt(qSlider.value,10)/100;
+  const ext = extFor(type);
+  convertBtn.disabled = true; clearBtn.disabled = true;
+  const zip = new JSZip();
+  const used = {};
+  let origTotal = 0, newTotal = 0, done = 0;
+
+  for(const it of items){
+    flash(`Converting ${++done}/${items.length}…`);
+    try{
+      const blob = await convertOne(it.file, type, quality);
+      let base = it.file.name.replace(/\.[^.]+$/,'');
+      let name = `${base}.${ext}`;
+      if(used[name]){ used[name]++; name = `${base}-${used[name]}.${ext}`; } else { used[name]=1; }
+      zip.file(name, blob);
+      origTotal += it.file.size; newTotal += blob.size;
+    }catch(err){ /* skip bad file */ }
+  }
+
+  flash('Packing .zip…');
+  const out = await zip.generateAsync({type:'blob', compression:'STORE'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(out);
+  a.download = `bench-${ext}-${items.length}.zip`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+
+  const saved = origTotal ? Math.max(0, Math.round((1-newTotal/origTotal)*100)) : 0;
+  flash(`Done — <b>${items.length}</b> files · ${fmtBytes(origTotal)} → ${fmtBytes(newTotal)} (saved ${saved}%)`);
+  convertBtn.disabled = false; clearBtn.disabled = false;
+});
+</script>
+</body>
+</html>
