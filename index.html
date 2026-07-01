@@ -6,6 +6,7 @@
 <title>The Bench by Supula — Browser Tools</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <style>
   :root{
     --ink:#16140f; --paper:#e9e3d4; --paper-2:#ddd5c2; --line:#bcb29a;
@@ -167,9 +168,45 @@
         <div class="card-top"><span class="card-no">TOOL 08</span><span class="card-ico">{ }</span></div>
         <div class="card-body"><h3 data-t="t8_h">JSON Formatter</h3><p data-t="t8_p"></p><div class="card-tag" data-t="t8_tag"></div></div>
       </button>
+      <button class="card-tool" data-open="pdfmerge">
+        <div class="card-top"><span class="card-no">TOOL 09</span><span class="card-ico">📚</span></div>
+        <div class="card-body"><h3 data-t="t9_h">Merge PDF</h3><p data-t="t9_p"></p><div class="card-tag" data-t="t9_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="pdfsplit">
+        <div class="card-top"><span class="card-no">TOOL 10</span><span class="card-ico">✂</span></div>
+        <div class="card-body"><h3 data-t="t10_h">Split PDF</h3><p data-t="t10_p"></p><div class="card-tag" data-t="t10_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="img2pdf">
+        <div class="card-top"><span class="card-no">TOOL 11</span><span class="card-ico">🖼</span></div>
+        <div class="card-body"><h3 data-t="t11_h">Image → PDF</h3><p data-t="t11_p"></p><div class="card-tag" data-t="t11_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="pdfcompress">
+        <div class="card-top"><span class="card-no">TOOL 12</span><span class="card-ico">🗄</span></div>
+        <div class="card-body"><h3 data-t="t12_h">Compress PDF</h3><p data-t="t12_p"></p><div class="card-tag" data-t="t12_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="unit">
+        <div class="card-top"><span class="card-no">TOOL 13</span><span class="card-ico">📏</span></div>
+        <div class="card-body"><h3 data-t="t13_h">Unit Converter</h3><p data-t="t13_p"></p><div class="card-tag" data-t="t13_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="calc">
+        <div class="card-top"><span class="card-no">TOOL 14</span><span class="card-ico">％</span></div>
+        <div class="card-body"><h3 data-t="t14_h">Percent & Tip</h3><p data-t="t14_p"></p><div class="card-tag" data-t="t14_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="age">
+        <div class="card-top"><span class="card-no">TOOL 15</span><span class="card-ico">📅</span></div>
+        <div class="card-body"><h3 data-t="t15_h">Age & Date</h3><p data-t="t15_p"></p><div class="card-tag" data-t="t15_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="count">
+        <div class="card-top"><span class="card-no">TOOL 16</span><span class="card-ico">🔤</span></div>
+        <div class="card-body"><h3 data-t="t16_h">Word Counter</h3><p data-t="t16_p"></p><div class="card-tag" data-t="t16_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="pass">
+        <div class="card-top"><span class="card-no">TOOL 17</span><span class="card-ico">🔑</span></div>
+        <div class="card-body"><h3 data-t="t17_h">Password Generator</h3><p data-t="t17_p"></p><div class="card-tag" data-t="t17_tag"></div></div>
+      </button>
       <button class="card-tool" disabled>
-        <div class="card-top"><span class="card-no">TOOL 09</span><span class="card-ico">＋</span></div>
-        <div class="card-body"><h3 data-t="t9_h">Coming next</h3><p data-t="t9_p"></p><div class="card-tag" data-t="t9_tag"></div></div>
+        <div class="card-top"><span class="card-no">TOOL 18</span><span class="card-ico">＋</span></div>
+        <div class="card-body"><h3 data-t="t18_h">Coming next</h3><p data-t="t18_p"></p><div class="card-tag" data-t="t18_tag"></div></div>
       </button>
     </div>
   </div>
@@ -331,6 +368,182 @@
     </section>
   </div>
 
+  <!-- MERGE PDF -->
+  <div class="view" id="view-pdfmerge">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t9_h">Merge PDF</h2><div class="meta" data-t="pm_meta">Combine PDFs in order</div></div>
+      <div class="panel-body">
+        <div class="drop" id="drop-pm" tabindex="0" role="button"><div class="big" data-t="pm_drop">Drop PDF files here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="pm_order">Added in the order you drop them</span></div><input type="file" id="file-pm" accept="application/pdf" multiple hidden></div>
+        <div class="queue" id="queue-pm"><div class="qhead"><span class="ql"><span data-t="queue">Queue</span> · <span id="count-pm">0</span></span><button class="ghost" id="clear-pm" data-t="clear">Clear all</button></div><div id="list-pm" style="display:flex;flex-direction:column;gap:8px"></div></div>
+        <div class="actions"><button class="go" id="run-pm" disabled data-t="pm_run">Merge &amp; download</button><span class="stat" id="stat-pm"></span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SPLIT PDF -->
+  <div class="view" id="view-pdfsplit">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t10_h">Split PDF</h2><div class="meta" data-t="ps_meta">Extract pages or ranges</div></div>
+      <div class="panel-body">
+        <div class="drop" id="drop-ps" tabindex="0" role="button" style="display:block"><div class="big" data-t="ps_drop">Drop a PDF here</div><div class="sub" data-t="drop_sub">or click / tap to choose a file</div><input type="file" id="file-ps" accept="application/pdf" hidden></div>
+        <div id="ps-work" style="display:none;margin-top:16px">
+          <p class="stat" id="ps-info" style="margin-bottom:12px"></p>
+          <div class="ctrl" style="max-width:420px"><label data-t="ps_range">Pages to keep</label>
+            <input type="text" id="ps-range" placeholder="1-3, 5, 8-10" style="width:100%"></div>
+          <p class="note" data-t="ps_note">Use commas and ranges, e.g. 1-3, 5, 8-10. Leave empty to split every page into its own PDF (downloaded as a zip).</p>
+          <div class="actions"><button class="go" id="ps-run" data-t="ps_run">Split &amp; download</button><button class="ghost" id="ps-new" data-t="crop_new">New file</button><span class="stat" id="stat-ps"></span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- IMAGE TO PDF -->
+  <div class="view" id="view-img2pdf">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t11_h">Image → PDF</h2><div class="meta" data-t="ip_meta">Images into one PDF</div></div>
+      <div class="panel-body">
+        <div class="controls">
+          <div class="ctrl"><label data-t="ip_page">Page size</label><select id="ip-page"><option value="fit" data-t="ip_fit">Fit to image</option><option value="a4">A4</option><option value="letter">Letter</option></select></div>
+          <div class="ctrl"><label data-t="ip_orient">Orientation</label><select id="ip-orient"><option value="portrait" data-t="ip_port">Portrait</option><option value="landscape" data-t="ip_land">Landscape</option></select></div>
+        </div>
+        <div class="drop" id="drop-ip" tabindex="0" role="button"><div class="big" data-t="drop_big">Drop images here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="ip_hint">One image per page, in order · PNG &amp; JPG</span></div><input type="file" id="file-ip" accept="image/png,image/jpeg" multiple hidden></div>
+        <div class="queue" id="queue-ip"><div class="qhead"><span class="ql"><span data-t="queue">Queue</span> · <span id="count-ip">0</span></span><button class="ghost" id="clear-ip" data-t="clear">Clear all</button></div><div class="grid" id="grid-ip"></div></div>
+        <div class="actions"><button class="go" id="run-ip" disabled data-t="ip_run">Create &amp; download PDF</button><span class="stat" id="stat-ip"></span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- COMPRESS PDF -->
+  <div class="view" id="view-pdfcompress">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t12_h">Compress PDF</h2><div class="meta" data-t="pc_meta">Shrink image-heavy PDFs</div></div>
+      <div class="panel-body">
+        <div class="controls">
+          <div class="ctrl"><label data-t="l_quality">Image quality</label><div class="qual"><input type="range" id="pc-q" min="30" max="90" value="60" step="5"><output id="pc-qv">60</output></div></div>
+        </div>
+        <div class="drop" id="drop-pc" tabindex="0" role="button" style="display:block"><div class="big" data-t="pc_drop">Drop a PDF here</div><div class="sub" data-t="drop_sub">or click / tap to choose a file</div><input type="file" id="file-pc" accept="application/pdf" hidden></div>
+        <div class="actions"><button class="go" id="pc-run" disabled data-t="pc_run">Compress &amp; download</button><span class="stat" id="stat-pc"></span></div>
+        <p class="note" data-t="pc_note">This re-compresses images embedded in the PDF, which helps most with scanned or photo-heavy files. PDFs that are mostly text won't shrink much — that's normal.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- UNIT CONVERTER -->
+  <div class="view" id="view-unit">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t13_h">Unit Converter</h2><div class="meta" data-t="u_meta">Length · weight · temp &amp; more</div></div>
+      <div class="panel-body">
+        <div class="controls">
+          <div class="ctrl"><label data-t="u_cat">Category</label><select id="u-cat"></select></div>
+        </div>
+        <div class="qr-wrap" style="align-items:center">
+          <div class="ctrl" style="flex:1 1 200px"><label data-t="u_from">From</label><input type="number" id="u-in" value="1" style="width:100%"><select id="u-fromU" style="width:100%;margin-top:8px"></select></div>
+          <div style="font-size:22px;color:var(--rust)">=</div>
+          <div class="ctrl" style="flex:1 1 200px"><label data-t="u_to">To</label><input type="text" id="u-out" readonly style="width:100%;background:var(--paper-2)"><select id="u-toU" style="width:100%;margin-top:8px"></select></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PERCENT & TIP -->
+  <div class="view" id="view-calc">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t14_h">Percent &amp; Tip</h2><div class="meta" data-t="c_meta">Quick everyday math</div></div>
+      <div class="panel-body">
+        <div style="display:flex;flex-direction:column;gap:22px;max-width:520px">
+          <div>
+            <div class="ctrl" style="margin-bottom:8px"><label data-t="c_tipttl">Tip calculator</label></div>
+            <div class="controls" style="margin:0">
+              <div class="ctrl"><label data-t="c_bill">Bill</label><input type="number" id="c-bill" value="3000" style="width:110px"></div>
+              <div class="ctrl"><label data-t="c_tip">Tip %</label><input type="number" id="c-tip" value="10" style="width:80px"></div>
+              <div class="ctrl"><label data-t="c_split">Split</label><input type="number" id="c-split" value="1" min="1" style="width:70px"></div>
+            </div>
+            <p class="stat" id="c-tipout" style="margin-top:10px"></p>
+          </div>
+          <div style="border-top:1.5px solid var(--line);padding-top:18px">
+            <div class="ctrl" style="margin-bottom:8px"><label data-t="c_pctttl">Percentage</label></div>
+            <div class="controls" style="margin:0;align-items:center">
+              <div class="ctrl"><input type="number" id="c-p1" value="20" style="width:80px"></div>
+              <div style="font-size:12px;color:var(--moss)" data-t="c_pctof">% of</div>
+              <div class="ctrl"><input type="number" id="c-p2" value="150" style="width:100px"></div>
+            </div>
+            <p class="stat" id="c-pctout" style="margin-top:10px"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- AGE & DATE -->
+  <div class="view" id="view-age">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t15_h">Age &amp; Date</h2><div class="meta" data-t="a_meta">Age and days between dates</div></div>
+      <div class="panel-body">
+        <div style="display:flex;flex-direction:column;gap:22px;max-width:520px">
+          <div>
+            <div class="ctrl" style="margin-bottom:8px"><label data-t="a_agettl">How old am I?</label></div>
+            <div class="ctrl"><label data-t="a_dob">Date of birth</label><input type="date" id="a-dob" style="width:190px"></div>
+            <p class="stat" id="a-ageout" style="margin-top:10px"></p>
+          </div>
+          <div style="border-top:1.5px solid var(--line);padding-top:18px">
+            <div class="ctrl" style="margin-bottom:8px"><label data-t="a_betttl">Days between two dates</label></div>
+            <div class="controls" style="margin:0">
+              <div class="ctrl"><label data-t="a_from">From</label><input type="date" id="a-d1" style="width:170px"></div>
+              <div class="ctrl"><label data-t="a_to">To</label><input type="date" id="a-d2" style="width:170px"></div>
+            </div>
+            <p class="stat" id="a-betout" style="margin-top:10px"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- WORD COUNTER -->
+  <div class="view" id="view-count">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t16_h">Word Counter</h2><div class="meta" data-t="w_meta">Words · characters · more</div></div>
+      <div class="panel-body">
+        <textarea id="w-in" spellcheck="false" data-t-ph="w_ph" placeholder="Paste or type your text here…" style="width:100%;min-height:220px;border:1.5px solid var(--ink);background:var(--paper);font-family:'Courier New',monospace;font-size:13px;padding:12px;resize:vertical;line-height:1.6"></textarea>
+        <div class="grid" id="w-stats" style="margin-top:16px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PASSWORD -->
+  <div class="view" id="view-pass">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t17_h">Password Generator</h2><div class="meta" data-t="p_meta">Strong random passwords</div></div>
+      <div class="panel-body">
+        <div style="max-width:560px">
+          <div style="display:flex;gap:10px;align-items:center;border:1.5px solid var(--ink);background:var(--paper);padding:12px 14px;font-size:18px;word-break:break-all">
+            <span id="p-out" style="flex:1;font-family:'Courier New',monospace"></span>
+            <button class="ghost" id="p-copy" data-t="copy" style="padding:6px 12px">Copy</button>
+          </div>
+          <div class="controls" style="margin-top:16px">
+            <div class="ctrl" style="flex:1 1 240px"><label><span data-t="p_len">Length</span>: <span id="p-lenv" style="color:var(--rust);font-weight:700">16</span></label><input type="range" id="p-len" min="6" max="48" value="16" style="width:100%"></div>
+          </div>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:6px;font-size:13px">
+            <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="p-upper" checked> <span data-t="p_upper">A-Z</span></label>
+            <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="p-lower" checked> <span data-t="p_lower">a-z</span></label>
+            <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="p-num" checked> <span data-t="p_num">0-9</span></label>
+            <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="p-sym" checked> <span data-t="p_sym">Symbols</span></label>
+          </div>
+          <div class="actions"><button class="go" id="p-gen" data-t="p_gen">Generate</button><span class="stat" id="p-strength"></span></div>
+          <p class="note" data-t="p_note">Passwords are generated on your device using the browser's secure random generator. Nothing is sent anywhere.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <footer><span data-t="foot">The Bench by Supula · files are processed in your browser, not uploaded.</span></footer>
 </div>
 
@@ -350,7 +563,28 @@ const I18N={
     t6_h:"Image Cropper", t6_p:"Crop to any area with preset ratios (1:1, 16:9, 4:5). Download PNG, JPG or WebP.", t6_tag:"Interactive · Offline",
     t7_h:"Favicon Generator", t7_p:"One image → every favicon size, an .ico, and the HTML snippet, all in one zip.", t7_tag:"Zip · Offline",
     t8_h:"JSON Formatter", t8_p:"Format, validate and minify JSON. Clear error messages when it's invalid.", t8_tag:"Dev · Offline",
-    t9_h:"Coming next", t9_p:"Room for more. Color picker, PDF merge, base64 — your call.", t9_tag:"Planned",
+    t9_h:"Merge PDF", t9_p:"Combine several PDFs into one, in the order you choose. Reorder before merging.", t9_tag:"PDF · Offline",
+    t10_h:"Split PDF", t10_p:"Keep specific pages or ranges, or split every page into its own file.", t10_tag:"PDF · Offline",
+    t11_h:"Image → PDF", t11_p:"Turn photos or scans into a single PDF, one image per page.", t11_tag:"PDF · Offline",
+    t12_h:"Compress PDF", t12_p:"Shrink image-heavy or scanned PDFs by re-compressing their images.", t12_tag:"PDF · Offline",
+    t13_h:"Unit Converter", t13_p:"Length, weight, temperature, area, volume, speed and data units.", t13_tag:"Everyday · Offline",
+    t14_h:"Percent & Tip", t14_p:"Split a bill, add a tip, or work out a percentage in seconds.", t14_tag:"Everyday · Offline",
+    t15_h:"Age & Date", t15_p:"Work out an exact age or the number of days between two dates.", t15_tag:"Everyday · Offline",
+    t16_h:"Word Counter", t16_p:"Live word, character, sentence and reading-time counts as you type.", t16_tag:"Everyday · Offline",
+    t17_h:"Password Generator", t17_p:"Strong random passwords with length and character options.", t17_tag:"Everyday · Offline",
+    t18_h:"Coming next", t18_p:"Room for more. Color picker, base64, timestamp — your call.", t18_tag:"Planned",
+    pm_meta:"Combine PDFs in order", pm_drop:"Drop PDF files here", pm_order:"Added in the order you drop them", pm_run:"Merge & download", up:"Up", down:"Down",
+    ps_meta:"Extract pages or ranges", ps_drop:"Drop a PDF here", ps_range:"Pages to keep", ps_run:"Split & download",
+    ps_note:"Use commas and ranges, e.g. 1-3, 5, 8-10. Leave empty to split every page into its own PDF (downloaded as a zip).",
+    ip_meta:"Images into one PDF", ip_page:"Page size", ip_fit:"Fit to image", ip_orient:"Orientation", ip_port:"Portrait", ip_land:"Landscape", ip_hint:"One image per page, in order · PNG & JPG", ip_run:"Create & download PDF",
+    pc_meta:"Shrink image-heavy PDFs", pc_drop:"Drop a PDF here", pc_run:"Compress & download",
+    pc_note:"This re-compresses images embedded in the PDF, which helps most with scanned or photo-heavy files. PDFs that are mostly text won't shrink much — that's normal.",
+    u_meta:"Length · weight · temp & more", u_cat:"Category", u_from:"From", u_to:"To",
+    c_meta:"Quick everyday math", c_tipttl:"Tip calculator", c_bill:"Bill", c_tip:"Tip %", c_split:"Split", c_pctttl:"Percentage", c_pctof:"% of",
+    a_meta:"Age and days between dates", a_agettl:"How old am I?", a_dob:"Date of birth", a_betttl:"Days between two dates", a_from:"From", a_to:"To",
+    w_meta:"Words · characters · more", w_ph:"Paste or type your text here…",
+    p_meta:"Strong random passwords", p_len:"Length", p_upper:"A-Z", p_lower:"a-z", p_num:"0-9", p_sym:"Symbols", p_gen:"Generate",
+    p_note:"Passwords are generated on your device using the browser's secure random generator. Nothing is sent anywhere.",
     run_conv:"Convert & download .zip", run_resize:"Resize & download .zip", run_compress:"Compress & download .zip", run_bg:"Remove backgrounds",
     l_convto:"Convert to", conv_meta:"Any format → PNG · JPG · WebP", conv_in:"Accepts PNG, JPG, WebP, GIF, BMP, AVIF",
     crop_meta:"Drag the box · pick a ratio", l_ratio:"Aspect ratio", opt_free:"Free", reset:"Reset box", crop_dl:"Crop & download", crop_new:"New image",
@@ -379,7 +613,28 @@ const I18N={
     t6_h:"画像切り抜き", t6_p:"任意の範囲で切り抜き。比率プリセット（1:1, 16:9, 4:5）対応。PNG・JPG・WebPで保存。", t6_tag:"操作式 · オフライン",
     t7_h:"ファビコン生成", t7_p:"1枚の画像から全サイズのファビコン、.ico、HTMLスニペットをzip 1つで。", t7_tag:"Zip · オフライン",
     t8_h:"JSON整形", t8_p:"JSONの整形・検証・圧縮。不正な場合はわかりやすいエラー表示。", t8_tag:"開発 · オフライン",
-    t9_h:"近日追加", t9_p:"まだ余白あり。カラーピッカー、PDF結合、base64など。", t9_tag:"予定",
+    t9_h:"PDF結合", t9_p:"複数のPDFを好きな順序で1つに結合。結合前に順序を変更できます。", t9_tag:"PDF · オフライン",
+    t10_h:"PDF分割", t10_p:"指定したページや範囲を抽出、または全ページを個別ファイルに分割。", t10_tag:"PDF · オフライン",
+    t11_h:"画像 → PDF", t11_p:"写真やスキャンを1画像1ページのPDFに変換。", t11_tag:"PDF · オフライン",
+    t12_h:"PDF圧縮", t12_p:"画像やスキャンの多いPDFを、内部画像を再圧縮して軽量化。", t12_tag:"PDF · オフライン",
+    t13_h:"単位変換", t13_p:"長さ・重さ・温度・面積・体積・速度・データ容量に対応。", t13_tag:"日常 · オフライン",
+    t14_h:"割合 & チップ", t14_p:"割り勘、チップ計算、パーセント計算を一瞬で。", t14_tag:"日常 · オフライン",
+    t15_h:"年齢 & 日付", t15_p:"正確な年齢や、2つの日付の間の日数を計算。", t15_tag:"日常 · オフライン",
+    t16_h:"文字数カウント", t16_p:"入力に合わせて単語数・文字数・文数・読了時間をリアルタイム表示。", t16_tag:"日常 · オフライン",
+    t17_h:"パスワード生成", t17_p:"長さと文字種を選べる強力なランダムパスワード。", t17_tag:"日常 · オフライン",
+    t18_h:"近日追加", t18_p:"まだ余白あり。カラーピッカー、base64、タイムスタンプなど。", t18_tag:"予定",
+    pm_meta:"PDFを順番に結合", pm_drop:"PDFファイルをドロップ", pm_order:"ドロップした順に追加されます", pm_run:"結合してDL", up:"上へ", down:"下へ",
+    ps_meta:"ページや範囲を抽出", ps_drop:"PDFをドロップ", ps_range:"残すページ", ps_run:"分割してDL",
+    ps_note:"カンマと範囲で指定（例: 1-3, 5, 8-10）。空欄にすると全ページを個別PDFに分割し、zipでダウンロードします。",
+    ip_meta:"画像を1つのPDFに", ip_page:"ページサイズ", ip_fit:"画像に合わせる", ip_orient:"向き", ip_port:"縦", ip_land:"横", ip_hint:"1画像1ページ、順番通り · PNG & JPG", ip_run:"PDFを作成してDL",
+    pc_meta:"画像の多いPDFを軽量化", pc_drop:"PDFをドロップ", pc_run:"圧縮してDL",
+    pc_note:"PDF内の画像を再圧縮します。スキャンや写真中心のファイルに効果的です。テキスト主体のPDFはあまり小さくなりません（正常です）。",
+    u_meta:"長さ・重さ・温度ほか", u_cat:"カテゴリ", u_from:"変換元", u_to:"変換先",
+    c_meta:"日常のかんたん計算", c_tipttl:"チップ計算", c_bill:"金額", c_tip:"チップ %", c_split:"人数", c_pctttl:"パーセント", c_pctof:"% of",
+    a_meta:"年齢と日付間の日数", a_agettl:"年齢を計算", a_dob:"生年月日", a_betttl:"2つの日付の間の日数", a_from:"開始", a_to:"終了",
+    w_meta:"単語・文字数ほか", w_ph:"ここにテキストを貼り付けまたは入力…",
+    p_meta:"強力なランダムパスワード", p_len:"長さ", p_upper:"A-Z", p_lower:"a-z", p_num:"0-9", p_sym:"記号", p_gen:"生成",
+    p_note:"パスワードはブラウザの安全な乱数生成器を使い端末内で生成されます。どこにも送信されません。",
     run_conv:"変換して .zip をDL", run_resize:"リサイズして .zip をDL", run_compress:"圧縮して .zip をDL", run_bg:"背景を除去",
     l_convto:"変換先", conv_meta:"どの形式でも → PNG · JPG · WebP", conv_in:"対応: PNG, JPG, WebP, GIF, BMP, AVIF",
     crop_meta:"枠をドラッグ · 比率を選択", l_ratio:"アスペクト比", opt_free:"自由", reset:"枠をリセット", crop_dl:"切り抜いてDL", crop_new:"別の画像",
@@ -401,15 +656,19 @@ function applyLang(l){
   LANG=l; document.documentElement.lang=l;
   const d=I18N[l];
   document.querySelectorAll('[data-t]').forEach(el=>{const k=el.dataset.t;if(d[k]!=null)el.textContent=d[k];});
+  document.querySelectorAll('[data-t-ph]').forEach(el=>{const k=el.dataset.tPh;if(d[k]!=null)el.placeholder=d[k];});
   const rzMode=document.getElementById('rz-mode');
   if(rzMode)document.getElementById('rz-vlabel').textContent=d[vlabelKey[rzMode.value]];
   document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));
   if(window.__qrRender)window.__qrRender();
+  if(window.__unitInit)window.__unitInit();
+  if(window.__refreshCalc)window.__refreshCalc();
+  if(window.__refreshCount)window.__refreshCount();
 }
 document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>applyLang(b.dataset.lang)));
 
 const landing=document.getElementById('landing');
-const views={img:'view-img',resize:'view-resize',compress:'view-compress',qr:'view-qr',bg:'view-bg',crop:'view-crop',favicon:'view-favicon',json:'view-json'};
+const views={img:'view-img',resize:'view-resize',compress:'view-compress',qr:'view-qr',bg:'view-bg',crop:'view-crop',favicon:'view-favicon',json:'view-json',pdfmerge:'view-pdfmerge',pdfsplit:'view-pdfsplit',img2pdf:'view-img2pdf',pdfcompress:'view-pdfcompress',unit:'view-unit',calc:'view-calc',age:'view-age',count:'view-count',pass:'view-pass'};
 function openTool(id){landing.classList.add('hidden');Object.values(views).forEach(v=>document.getElementById(v).classList.remove('active'));document.getElementById(views[id]).classList.add('active');location.hash=id;scrollTo({top:0,behavior:'smooth'});}
 function goHome(){landing.classList.remove('hidden');Object.values(views).forEach(v=>document.getElementById(v).classList.remove('active'));location.hash='';scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openTool(b.dataset.open)));
@@ -622,6 +881,209 @@ function uniqueName(used,base,ext){let n=`${base}.${ext}`;if(used[n]){used[n]++;
   document.getElementById('json-format').addEventListener('click',()=>{const r=parseOrShow();if(r.ok){ta.value=JSON.stringify(r.val,null,getIndent());stat.innerHTML=`<span>✓ ${LANG==='ja'?'整形しました':'Valid & formatted'}</span>`;}});
   document.getElementById('json-min').addEventListener('click',()=>{const r=parseOrShow();if(r.ok){ta.value=JSON.stringify(r.val);stat.innerHTML=`<span>✓ ${LANG==='ja'?'圧縮しました':'Minified'}</span>`;}});
   document.getElementById('json-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(ta.value);stat.innerHTML=`<span>✓ ${LANG==='ja'?'コピーしました':'Copied'}</span>`;}catch(e){stat.textContent='—';}});
+})();
+
+/* ================= PDF tools ================= */
+const PDFReady=()=>window.PDFLib;
+
+/* Tool 09: Merge PDF */
+(()=>{
+  const drop=document.getElementById('drop-pm'),input=document.getElementById('file-pm'),queue=document.getElementById('queue-pm'),
+    list=document.getElementById('list-pm'),countEl=document.getElementById('count-pm'),runBtn=document.getElementById('run-pm'),
+    clearBtn=document.getElementById('clear-pm'),stat=document.getElementById('stat-pm');
+  let files=[];
+  drop.addEventListener('click',()=>input.click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>add(e.dataTransfer.files));
+  input.addEventListener('change',e=>{add(e.target.files);input.value='';});
+  clearBtn.addEventListener('click',()=>{files=[];render();stat.textContent='';});
+  function add(fl){[...fl].filter(f=>f.type==='application/pdf').forEach(f=>files.push(f));render();}
+  function render(){countEl.textContent=files.length;queue.style.display=files.length?'block':'none';runBtn.disabled=files.length<1;list.innerHTML='';
+    files.forEach((f,i)=>{const row=document.createElement('div');row.className='card';row.style.cssText='display:flex;align-items:center;gap:10px;padding:8px 10px';
+      row.innerHTML=`<span style="color:var(--rust);font-weight:700">${i+1}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span><span class="size" style="font-size:11px;color:var(--moss)">${fmtBytes(f.size)}</span>`;
+      const mk=(txt,fn,dis)=>{const b=document.createElement('button');b.className='ghost';b.style.cssText='padding:4px 8px;font-size:11px';b.textContent=txt;b.disabled=dis;b.onclick=fn;return b;};
+      row.appendChild(mk('↑',()=>{[files[i-1],files[i]]=[files[i],files[i-1]];render();},i===0));
+      row.appendChild(mk('↓',()=>{[files[i+1],files[i]]=[files[i],files[i+1]];render();},i===files.length-1));
+      row.appendChild(mk('✕',()=>{files.splice(i,1);render();}));
+      list.appendChild(row);});}
+  runBtn.addEventListener('click',async()=>{if(files.length<1||!PDFReady())return;runBtn.disabled=true;stat.textContent='…';
+    try{const out=await PDFLib.PDFDocument.create();
+      for(const f of files){const src=await PDFLib.PDFDocument.load(await f.arrayBuffer());const pages=await out.copyPages(src,src.getPageIndices());pages.forEach(p=>out.addPage(p));}
+      const bytes=await out.save();dl(new Blob([bytes],{type:'application/pdf'}),'bench-merged.pdf');stat.innerHTML=`✓ ${files.length} → 1`;}
+    catch(e){stat.innerHTML=`<span style="color:var(--rust)">${LANG==='ja'?'結合に失敗しました':'Merge failed'}</span>`;}runBtn.disabled=false;});
+})();
+
+/* Tool 10: Split PDF */
+(()=>{
+  const drop=document.getElementById('drop-ps'),input=document.getElementById('file-ps'),work=document.getElementById('ps-work'),
+    info=document.getElementById('ps-info'),range=document.getElementById('ps-range'),stat=document.getElementById('stat-ps');
+  let curFile=null,pageCount=0;
+  drop.addEventListener('click',()=>input.click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{const f=[...e.dataTransfer.files].find(x=>x.type==='application/pdf');if(f)load(f);});
+  input.addEventListener('change',e=>{if(e.target.files[0])load(e.target.files[0]);input.value='';});
+  async function load(f){if(!PDFReady())return;curFile=f;const doc=await PDFLib.PDFDocument.load(await f.arrayBuffer());pageCount=doc.getPageCount();
+    info.textContent=(LANG==='ja'?`${pageCount}ページのPDF`:`${pageCount}-page PDF`);drop.style.display='none';work.style.display='block';}
+  function parseRange(str,max){const keep=[];str.split(',').forEach(part=>{part=part.trim();if(!part)return;const m=part.split('-');
+    if(m.length===2){let a=parseInt(m[0]),b=parseInt(m[1]);if(!isNaN(a)&&!isNaN(b)){if(a>b)[a,b]=[b,a];for(let i=a;i<=b;i++)if(i>=1&&i<=max)keep.push(i-1);}}
+    else{const n=parseInt(part);if(!isNaN(n)&&n>=1&&n<=max)keep.push(n-1);}});return [...new Set(keep)];}
+  document.getElementById('ps-run').addEventListener('click',async()=>{if(!curFile||!PDFReady())return;stat.textContent='…';
+    try{const src=await PDFLib.PDFDocument.load(await curFile.arrayBuffer());const base=curFile.name.replace(/\.pdf$/i,'');
+      if(!range.value.trim()){const zip=new JSZip();
+        for(let i=0;i<pageCount;i++){const d=await PDFLib.PDFDocument.create();const[p]=await d.copyPages(src,[i]);d.addPage(p);zip.file(`${base}-p${i+1}.pdf`,await d.save());}
+        dl(await zip.generateAsync({type:'blob',compression:'STORE'}),`${base}-split.zip`);stat.innerHTML=`✓ ${pageCount}`;}
+      else{const idx=parseRange(range.value,pageCount);if(!idx.length){stat.innerHTML=`<span style="color:var(--rust)">${LANG==='ja'?'ページ指定が無効です':'No valid pages'}</span>`;return;}
+        const d=await PDFLib.PDFDocument.create();const pages=await d.copyPages(src,idx);pages.forEach(p=>d.addPage(p));
+        dl(new Blob([await d.save()],{type:'application/pdf'}),`${base}-pages.pdf`);stat.innerHTML=`✓ ${idx.length} ${LANG==='ja'?'ページ':'pages'}`;}}
+    catch(e){stat.innerHTML=`<span style="color:var(--rust)">${LANG==='ja'?'分割に失敗しました':'Split failed'}</span>`;}});
+  document.getElementById('ps-new').addEventListener('click',()=>{work.style.display='none';drop.style.display='block';range.value='';stat.textContent='';});
+})();
+
+/* Tool 11: Image to PDF */
+(()=>{
+  const q=makeQueue({grid:'grid-ip',queue:'queue-ip',count:'count-ip',run:'run-ip',stat:'stat-ip',drop:'drop-ip',input:'file-ip',clear:'clear-ip',max:100});
+  const pageSel=document.getElementById('ip-page'),orientSel=document.getElementById('ip-orient');
+  const SIZES={a4:[595.28,841.89],letter:[612,792]};
+  q.runBtn.addEventListener('click',async()=>{const items=q.get();if(!items.length||!PDFReady())return;q.lock(true);q.flash('…');
+    try{const doc=await PDFLib.PDFDocument.create();
+      for(const it of items){const bytes=await it.file.arrayBuffer();const isPng=it.file.type==='image/png';
+        const img=isPng?await doc.embedPng(bytes):await doc.embedJpg(bytes);
+        let pw,ph;
+        if(pageSel.value==='fit'){pw=img.width;ph=img.height;}
+        else{[pw,ph]=SIZES[pageSel.value];if(orientSel.value==='landscape')[pw,ph]=[ph,pw];}
+        const page=doc.addPage([pw,ph]);
+        const scale=pageSel.value==='fit'?1:Math.min(pw/img.width,ph/img.height);
+        const w=img.width*scale,h=img.height*scale;page.drawImage(img,{x:(pw-w)/2,y:(ph-h)/2,width:w,height:h});}
+      dl(new Blob([await doc.save()],{type:'application/pdf'}),`bench-images-${items.length}p.pdf`);q.flash(`✓ ${items.length} ${LANG==='ja'?'ページ':'pages'}`);}
+    catch(e){q.flash(`<span style="color:var(--rust)">${LANG==='ja'?'作成に失敗しました':'Failed'}</span>`);}q.lock(false);});
+})();
+
+/* Tool 12: Compress PDF (re-embed rasterized pages' images by re-compressing embedded images) */
+(()=>{
+  const drop=document.getElementById('drop-pc'),input=document.getElementById('file-pc'),runBtn=document.getElementById('pc-run'),
+    stat=document.getElementById('stat-pc'),sl=document.getElementById('pc-q'),out=document.getElementById('pc-qv');
+  let curFile=null;sl.oninput=()=>out.textContent=sl.value;
+  drop.addEventListener('click',()=>input.click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{const f=[...e.dataTransfer.files].find(x=>x.type==='application/pdf');if(f)set(f);});
+  input.addEventListener('change',e=>{if(e.target.files[0])set(e.target.files[0]);input.value='';});
+  function set(f){curFile=f;runBtn.disabled=false;stat.textContent=f.name+' · '+fmtBytes(f.size);}
+  runBtn.addEventListener('click',async()=>{if(!curFile||!PDFReady()||!window.pdfjsLib){await ensurePdfjs();}
+    if(!curFile)return;runBtn.disabled=true;stat.textContent='…';
+    try{
+      const quality=+sl.value/100;const data=new Uint8Array(await curFile.arrayBuffer());
+      const pdf=await pdfjsLib.getDocument({data}).promise;const outDoc=await PDFLib.PDFDocument.create();
+      for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i);const vp=page.getViewport({scale:1.5});
+        const canvas=document.createElement('canvas');canvas.width=vp.width;canvas.height=vp.height;const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+        await page.render({canvasContext:ctx,viewport:vp}).promise;
+        const jpgBlob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',quality));
+        const jpg=await outDoc.embedJpg(await jpgBlob.arrayBuffer());
+        const p=outDoc.addPage([vp.width,vp.height]);p.drawImage(jpg,{x:0,y:0,width:vp.width,height:vp.height});
+        stat.textContent=`${i}/${pdf.numPages}…`;}
+      const bytes=await outDoc.save();const saved=Math.max(0,Math.round((1-bytes.length/curFile.size)*100));
+      dl(new Blob([bytes],{type:'application/pdf'}),curFile.name.replace(/\.pdf$/i,'')+'-compressed.pdf');
+      stat.innerHTML=`✓ ${fmtBytes(curFile.size)} → ${fmtBytes(bytes.length)} (−${saved}%)`;}
+    catch(e){stat.innerHTML=`<span style="color:var(--rust)">${LANG==='ja'?'圧縮に失敗しました':'Compress failed'}</span>`;}
+    runBtn.disabled=false;});
+  let pdfjsLoading=null;
+  function ensurePdfjs(){if(window.pdfjsLib)return Promise.resolve();if(pdfjsLoading)return pdfjsLoading;
+    pdfjsLoading=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
+      s.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';res();};s.onerror=rej;document.head.appendChild(s);});
+    return pdfjsLoading;}
+})();
+
+/* ================= Everyday tools ================= */
+
+/* Tool 13: Unit Converter */
+(()=>{
+  const catSel=document.getElementById('u-cat'),inEl=document.getElementById('u-in'),outEl=document.getElementById('u-out'),
+    fromU=document.getElementById('u-fromU'),toU=document.getElementById('u-toU');
+  const CATS={
+    length:{en:'Length',ja:'長さ',u:{m:1,km:1000,cm:0.01,mm:0.001,mi:1609.344,yd:0.9144,ft:0.3048,in:0.0254}},
+    weight:{en:'Weight',ja:'重さ',u:{kg:1,g:0.001,mg:1e-6,lb:0.45359237,oz:0.0283495231,t:1000}},
+    area:{en:'Area',ja:'面積',u:{'m²':1,'km²':1e6,'cm²':1e-4,ha:1e4,'ft²':0.092903,'ac':4046.856}},
+    volume:{en:'Volume',ja:'体積',u:{L:1,mL:0.001,'m³':1000,gal:3.785411784,qt:0.946352946,cup:0.2365882365,'fl oz':0.0295735296}},
+    speed:{en:'Speed',ja:'速度',u:{'km/h':1,'m/s':3.6,mph:1.609344,knot:1.852}},
+    data:{en:'Data',ja:'データ',u:{B:1,KB:1024,MB:1048576,GB:1073741824,TB:1099511627776}},
+    temp:{en:'Temperature',ja:'温度',u:{'°C':'c','°F':'f','K':'k'}}
+  };
+  function fillCats(){catSel.innerHTML='';Object.keys(CATS).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=CATS[k][LANG]||CATS[k].en;catSel.appendChild(o);});}
+  function fillUnits(){const c=CATS[catSel.value];const keys=Object.keys(c.u);[fromU,toU].forEach((sel,si)=>{const prev=sel.value;sel.innerHTML='';keys.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;sel.appendChild(o);});sel.value=prev&&keys.includes(prev)?prev:keys[si===0?0:Math.min(1,keys.length-1)];});}
+  function convert(){const c=CATS[catSel.value];const v=parseFloat(inEl.value);if(isNaN(v)){outEl.value='';return;}
+    let r;
+    if(catSel.value==='temp'){const f=c.u[fromU.value],t=c.u[toU.value];let cel=f==='c'?v:f==='f'?(v-32)*5/9:v-273.15;r=t==='c'?cel:t==='f'?cel*9/5+32:cel+273.15;}
+    else{r=v*c.u[fromU.value]/c.u[toU.value];}
+    outEl.value=(Math.round(r*1e6)/1e6).toLocaleString();}
+  catSel.addEventListener('change',()=>{fillUnits();convert();});
+  [inEl,fromU,toU].forEach(el=>el.addEventListener('input',convert));
+  window.__unitInit=()=>{const cv=catSel.value;fillCats();catSel.value=cv||'length';fillUnits();convert();};
+  fillCats();fillUnits();convert();
+})();
+
+/* Tool 14: Percent & Tip */
+(()=>{
+  const bill=document.getElementById('c-bill'),tip=document.getElementById('c-tip'),split=document.getElementById('c-split'),
+    tipOut=document.getElementById('c-tipout'),p1=document.getElementById('c-p1'),p2=document.getElementById('c-p2'),pctOut=document.getElementById('c-pctout');
+  function calc(){const b=+bill.value||0,t=+tip.value||0,s=Math.max(1,+split.value||1);
+    const tipAmt=b*t/100,total=b+tipAmt,per=total/s;
+    tipOut.innerHTML=LANG==='ja'?`チップ <b>${tipAmt.toLocaleString()}</b> · 合計 <b>${total.toLocaleString()}</b>${s>1?` · 1人あたり <b>${per.toFixed(2)}</b>`:''}`
+      :`Tip <b>${tipAmt.toLocaleString()}</b> · Total <b>${total.toLocaleString()}</b>${s>1?` · Each <b>${per.toFixed(2)}</b>`:''}`;
+    const a=+p1.value||0,c=+p2.value||0;pctOut.innerHTML=`${a}% ${LANG==='ja'?'は':'of'} ${c} = <b>${(a*c/100).toLocaleString()}</b>`;}
+  [bill,tip,split,p1,p2].forEach(el=>el.addEventListener('input',calc));
+  window.__refreshCalc=calc;calc();
+})();
+
+/* Tool 15: Age & Date */
+(()=>{
+  const dob=document.getElementById('a-dob'),ageOut=document.getElementById('a-ageout'),d1=document.getElementById('a-d1'),d2=document.getElementById('a-d2'),betOut=document.getElementById('a-betout');
+  function age(){if(!dob.value){ageOut.textContent='';return;}const b=new Date(dob.value),n=new Date();
+    let y=n.getFullYear()-b.getFullYear(),m=n.getMonth()-b.getMonth(),d=n.getDate()-b.getDate();
+    if(d<0){m--;d+=new Date(n.getFullYear(),n.getMonth(),0).getDate();}if(m<0){y--;m+=12;}
+    const days=Math.floor((n-b)/864e5);
+    ageOut.innerHTML=LANG==='ja'?`<b>${y}</b>歳 <b>${m}</b>ヶ月 <b>${d}</b>日 · 合計 ${days.toLocaleString()}日`:`<b>${y}</b> years, <b>${m}</b> months, <b>${d}</b> days · ${days.toLocaleString()} days total`;}
+  function between(){if(!d1.value||!d2.value){betOut.textContent='';return;}const a=new Date(d1.value),b=new Date(d2.value);
+    const days=Math.round(Math.abs(b-a)/864e5);betOut.innerHTML=LANG==='ja'?`<b>${days.toLocaleString()}</b> 日`:`<b>${days.toLocaleString()}</b> days`;}
+  dob.addEventListener('input',age);[d1,d2].forEach(e=>e.addEventListener('input',between));
+  window.__refreshAge=()=>{age();between();};age();between();
+})();
+
+/* Tool 16: Word Counter */
+(()=>{
+  const ta=document.getElementById('w-in'),wrap=document.getElementById('w-stats');
+  function stats(){const t=ta.value;const words=(t.trim().match(/\S+/g)||[]).length;const chars=t.length;
+    const charsNoSpace=t.replace(/\s/g,'').length;const sentences=(t.match(/[.!?。！？]+/g)||[]).length;
+    const paras=(t.trim()?t.trim().split(/\n\s*\n/).length:0);const mins=Math.max(1,Math.round(words/200));
+    const L={en:{words:'Words',chars:'Characters',cns:'No spaces',sent:'Sentences',para:'Paragraphs',read:'Read time'},
+             ja:{words:'単語',chars:'文字',cns:'空白除く',sent:'文',para:'段落',read:'読了時間'}}[LANG];
+    const data=[[L.words,words],[L.chars,chars],[L.cns,charsNoSpace],[L.sent,sentences],[L.para,paras],[L.read,mins+(LANG==='ja'?'分':' min')]];
+    wrap.innerHTML=data.map(([k,v])=>`<div class="card" style="padding:12px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--rust);font-family:Georgia,serif">${typeof v==='number'?v.toLocaleString():v}</div><div style="font-size:11px;color:var(--moss);letter-spacing:1px;text-transform:uppercase;margin-top:4px">${k}</div></div>`).join('');}
+  ta.addEventListener('input',stats);window.__refreshCount=stats;stats();
+})();
+
+/* Tool 17: Password Generator */
+(()=>{
+  const out=document.getElementById('p-out'),len=document.getElementById('p-len'),lenV=document.getElementById('p-lenv'),
+    strength=document.getElementById('p-strength'),U=document.getElementById('p-upper'),L=document.getElementById('p-lower'),
+    N=document.getElementById('p-num'),S=document.getElementById('p-sym');
+  const SETS={u:'ABCDEFGHJKLMNPQRSTUVWXYZ',l:'abcdefghijkmnopqrstuvwxyz',n:'23456789',s:'!@#$%^&*-_=+?'};
+  len.addEventListener('input',()=>{lenV.textContent=len.value;gen();});
+  function gen(){let pool='';if(U.checked)pool+=SETS.u;if(L.checked)pool+=SETS.l;if(N.checked)pool+=SETS.n;if(S.checked)pool+=SETS.s;
+    if(!pool){out.textContent='—';strength.textContent='';return;}
+    const n=+len.value,arr=new Uint32Array(n);crypto.getRandomValues(arr);let pw='';for(let i=0;i<n;i++)pw+=pool[arr[i]%pool.length];
+    out.textContent=pw;
+    const bits=Math.round(n*Math.log2(pool.length));const lvl=bits<50?(LANG==='ja'?'弱い':'Weak'):bits<80?(LANG==='ja'?'普通':'Fair'):bits<120?(LANG==='ja'?'強い':'Strong'):(LANG==='ja'?'非常に強い':'Very strong');
+    const col=bits<50?'var(--rust)':bits<80?'var(--moss)':'var(--ink)';strength.innerHTML=`<span style="color:${col}">${lvl}</span> · ~${bits} bits`;}
+  [U,L,N,S].forEach(c=>c.addEventListener('change',gen));
+  document.getElementById('p-gen').addEventListener('click',gen);
+  document.getElementById('p-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(out.textContent);strength.innerHTML=`<span>✓ ${LANG==='ja'?'コピーしました':'Copied'}</span>`;}catch(e){}});
+  gen();
 })();
 
 applyLang('en');
