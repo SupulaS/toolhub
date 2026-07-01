@@ -136,8 +136,8 @@
     <p class="lead" data-t="lead">Pick a tool. Everything runs in your browser — your files are never uploaded to a server.</p>
     <div class="cards">
       <button class="card-tool" data-open="img">
-        <div class="card-top"><span class="card-no">TOOL 01</span><span class="card-ico">🖼</span></div>
-        <div class="card-body"><h3 data-t="t1_h">Image → WebP</h3><p data-t="t1_p"></p><div class="card-tag" data-t="t1_tag"></div></div>
+        <div class="card-top"><span class="card-no">TOOL 01</span><span class="card-ico">🔄</span></div>
+        <div class="card-body"><h3 data-t="t1_h">Image Converter</h3><p data-t="t1_p"></p><div class="card-tag" data-t="t1_tag"></div></div>
       </button>
       <button class="card-tool" data-open="resize">
         <div class="card-top"><span class="card-no">TOOL 02</span><span class="card-ico">📐</span></div>
@@ -166,15 +166,15 @@
   <div class="view" id="view-img">
     <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
     <section class="panel">
-      <div class="panel-head"><h2 data-t="t1_h">Image to WebP</h2><div class="meta">PNG · JPG · GIF → WEBP</div></div>
+      <div class="panel-head"><h2 data-t="t1_h">Image Converter</h2><div class="meta" data-t="conv_meta">Any format → PNG · JPG · WebP</div></div>
       <div class="panel-body">
         <div class="controls">
-          <div class="ctrl"><label data-t="l_output">Output</label><select id="fmt"><option value="image/webp" selected>WebP</option><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option></select></div>
-          <div class="ctrl"><label data-t="l_quality">Quality</label><div class="qual"><input type="range" id="q" min="10" max="100" value="80" step="5"><output id="qv">80</output></div></div>
+          <div class="ctrl"><label data-t="l_convto">Convert to</label><select id="fmt"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp" selected>WebP</option></select></div>
+          <div class="ctrl" id="q-wrap"><label data-t="l_quality">Quality</label><div class="qual"><input type="range" id="q" min="10" max="100" value="85" step="5"><output id="qv">85</output></div></div>
         </div>
-        <div class="drop" id="drop-img" tabindex="0" role="button"><div class="big" data-t="drop_big">Drop images here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="upto">Up to</span> <b>30</b> · <span data-t="one_zip">one .zip</span></div><input type="file" id="file-img" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" multiple hidden></div>
+        <div class="drop" id="drop-img" tabindex="0" role="button"><div class="big" data-t="drop_big">Drop images here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="conv_in">Accepts PNG, JPG, WebP, GIF, BMP, AVIF</span> · <b>30</b> · <span data-t="one_zip">one .zip</span></div><input type="file" id="file-img" accept="image/*" multiple hidden></div>
         <div class="queue" id="queue-img"><div class="qhead"><span class="ql"><span data-t="queue">Queue</span> · <span id="count-img">0</span>/30</span><button class="ghost" id="clear-img" data-t="clear">Clear all</button></div><div class="grid" id="grid-img"></div></div>
-        <div class="actions"><button class="go" id="run-img" disabled data-t="run_webp">Convert &amp; download .zip</button><span class="stat" id="stat-img"></span></div>
+        <div class="actions"><button class="go" id="run-img" disabled data-t="run_conv">Convert &amp; download .zip</button><span class="stat" id="stat-img"></span></div>
       </div>
     </section>
   </div>
@@ -263,13 +263,14 @@ const I18N={
     back:"← All tools", queue:"Queue", clear:"Clear all", upto:"Up to", one_zip:"one .zip",
     l_output:"Output", l_quality:"Quality", l_mode:"Resize by", l_width_px:"Width (px)", l_height_px:"Height (px)", l_percent:"Percent (%)",
     opt_keep:"Keep format", keep_ratio:"Keeps aspect ratio", drop_big:"Drop images here", drop_sub:"or click / tap to choose files",
-    t1_h:"Image → WebP", t1_p:"Convert PNG, JPG or GIF to WebP (or JPEG/PNG). Batch up to 30, download one zip.", t1_tag:"Batch · Zip · Offline",
+    t1_h:"Image Converter", t1_p:"Convert between PNG, JPG and WebP — any image in, any format out. Batch up to 30, one zip.", t1_tag:"Any → Any · Zip · Offline",
     t2_h:"Image Resizer", t2_p:"Resize by width, height or percent, keeping aspect ratio. Batch up to 30, one zip.", t2_tag:"Batch · Zip · Offline",
     t3_h:"Image Compressor", t3_p:"Shrink file size with a quality slider. See how much you saved. Batch, one zip.", t3_tag:"Batch · Zip · Offline",
     t4_h:"QR Code Generator", t4_p:"Turn any text or link into a QR code. Pick colors and size, download PNG or SVG.", t4_tag:"Instant · Offline",
     t5_h:"Background Remover", t5_p:"AI cutout to transparent PNG, in your browser. Batch up to 20, download one zip.", t5_tag:"AI · One-time model load",
     t6_h:"Coming next", t6_p:"Room for more. Crop, favicon maker, color picker — your call.", t6_tag:"Planned",
-    run_webp:"Convert & download .zip", run_resize:"Resize & download .zip", run_compress:"Compress & download .zip", run_bg:"Remove backgrounds",
+    run_conv:"Convert & download .zip", run_resize:"Resize & download .zip", run_compress:"Compress & download .zip", run_bg:"Remove backgrounds",
+    l_convto:"Convert to", conv_meta:"Any format → PNG · JPG · WebP", conv_in:"Accepts PNG, JPG, WebP, GIF, BMP, AVIF",
     qr_meta:"Text or link → QR", l_qtext:"Text or URL", l_size:"Size (px)", l_fg:"Dark", l_bg:"Light",
     dl_png:"Download PNG", dl_svg:"Download SVG", qr_empty:"Type something to generate",
     qr_note:"Longer text makes a denser code that's harder to scan. Keep good contrast for reliable scanning.",
@@ -283,13 +284,14 @@ const I18N={
     back:"← ツール一覧", queue:"キュー", clear:"すべて消去", upto:"最大", one_zip:"zip 1つ",
     l_output:"出力形式", l_quality:"画質", l_mode:"基準", l_width_px:"幅 (px)", l_height_px:"高さ (px)", l_percent:"割合 (%)",
     opt_keep:"元の形式", keep_ratio:"縦横比を維持", drop_big:"ここに画像をドロップ", drop_sub:"またはクリック / タップして選択",
-    t1_h:"画像 → WebP", t1_p:"PNG・JPG・GIF を WebP（または JPEG/PNG）に変換。最大30枚、zip 1つでダウンロード。", t1_tag:"一括 · Zip · オフライン",
+    t1_h:"画像変換", t1_p:"PNG・JPG・WebP を相互変換。どの画像からどの形式へでも。最大30枚、zip 1つ。", t1_tag:"どれでも変換 · Zip · オフライン",
     t2_h:"画像リサイズ", t2_p:"幅・高さ・割合でリサイズ、縦横比を維持。最大30枚、zip 1つ。", t2_tag:"一括 · Zip · オフライン",
     t3_h:"画像圧縮", t3_p:"画質スライダーでファイルを軽量化。削減率も表示。一括、zip 1つ。", t3_tag:"一括 · Zip · オフライン",
     t4_h:"QRコード生成", t4_p:"テキストやリンクをQRコードに。色とサイズを選び、PNGかSVGで保存。", t4_tag:"即時 · オフライン",
     t5_h:"背景除去", t5_p:"AIでブラウザ内で透過PNGに切り抜き。最大20枚、zip 1つ。", t5_tag:"AI · モデル初回読込",
     t6_h:"近日追加", t6_p:"まだ余白あり。切り抜き、ファビコン作成、カラーピッカーなど。", t6_tag:"予定",
-    run_webp:"変換して .zip をDL", run_resize:"リサイズして .zip をDL", run_compress:"圧縮して .zip をDL", run_bg:"背景を除去",
+    run_conv:"変換して .zip をDL", run_resize:"リサイズして .zip をDL", run_compress:"圧縮して .zip をDL", run_bg:"背景を除去",
+    l_convto:"変換先", conv_meta:"どの形式でも → PNG · JPG · WebP", conv_in:"対応: PNG, JPG, WebP, GIF, BMP, AVIF",
     qr_meta:"テキスト/リンク → QR", l_qtext:"テキストまたはURL", l_size:"サイズ (px)", l_fg:"前景色", l_bg:"背景色",
     dl_png:"PNG をダウンロード", dl_svg:"SVG をダウンロード", qr_empty:"入力すると生成されます",
     qr_note:"文字数が多いほどコードが密になり読み取りにくくなります。コントラストを保つと安定して読めます。",
@@ -354,10 +356,13 @@ async function canvasBlob(img,w,h,type,quality){const c=document.createElement('
 const extOf=m=>({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'})[m]||'img';
 function uniqueName(used,base,ext){let n=`${base}.${ext}`;if(used[n]){used[n]++;n=`${base}-${used[n]}.${ext}`;}else used[n]=1;return n;}
 
-/* WebP */
+/* Converter */
 (()=>{const q=makeQueue({grid:'grid-img',queue:'queue-img',count:'count-img',run:'run-img',stat:'stat-img',drop:'drop-img',input:'file-img',clear:'clear-img',max:30});
-  const fmt=document.getElementById('fmt'),sl=document.getElementById('q'),out=document.getElementById('qv');sl.oninput=()=>out.textContent=sl.value;
-  q.runBtn.addEventListener('click',async()=>{const items=q.get();if(!items.length)return;const type=fmt.value,quality=+sl.value/100,ext=extOf(type);
+  const fmt=document.getElementById('fmt'),sl=document.getElementById('q'),out=document.getElementById('qv'),qWrap=document.getElementById('q-wrap');
+  sl.oninput=()=>out.textContent=sl.value;
+  const syncQ=()=>{qWrap.style.visibility=fmt.value==='image/png'?'hidden':'visible';};
+  fmt.addEventListener('change',syncQ);syncQ();
+  q.runBtn.addEventListener('click',async()=>{const items=q.get();if(!items.length)return;const type=fmt.value,quality=type==='image/png'?undefined:+sl.value/100,ext=extOf(type);
     q.lock(true);const zip=new JSZip(),used={};let orig=0,neu=0,d=0;
     for(const it of items){q.flash(`${++d}/${items.length}…`);try{const img=await loadImg(it.file);const b=await canvasBlob(img,img.naturalWidth,img.naturalHeight,type,quality);
       zip.file(uniqueName(used,it.file.name.replace(/\.[^.]+$/,''),ext),b);q.setSize(it.id,b.size);orig+=it.file.size;neu+=b.size;}catch(e){}}
