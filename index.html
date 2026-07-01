@@ -155,9 +155,21 @@
         <div class="card-top"><span class="card-no">TOOL 05</span><span class="card-ico">✂️</span></div>
         <div class="card-body"><h3 data-t="t5_h">Background Remover</h3><p data-t="t5_p"></p><div class="card-tag" data-t="t5_tag"></div></div>
       </button>
+      <button class="card-tool" data-open="crop">
+        <div class="card-top"><span class="card-no">TOOL 06</span><span class="card-ico">▧</span></div>
+        <div class="card-body"><h3 data-t="t6_h">Image Cropper</h3><p data-t="t6_p"></p><div class="card-tag" data-t="t6_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="favicon">
+        <div class="card-top"><span class="card-no">TOOL 07</span><span class="card-ico">🎯</span></div>
+        <div class="card-body"><h3 data-t="t7_h">Favicon Generator</h3><p data-t="t7_p"></p><div class="card-tag" data-t="t7_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="json">
+        <div class="card-top"><span class="card-no">TOOL 08</span><span class="card-ico">{ }</span></div>
+        <div class="card-body"><h3 data-t="t8_h">JSON Formatter</h3><p data-t="t8_p"></p><div class="card-tag" data-t="t8_tag"></div></div>
+      </button>
       <button class="card-tool" disabled>
-        <div class="card-top"><span class="card-no">TOOL 06</span><span class="card-ico">＋</span></div>
-        <div class="card-body"><h3 data-t="t6_h">Coming next</h3><p data-t="t6_p"></p><div class="card-tag" data-t="t6_tag"></div></div>
+        <div class="card-top"><span class="card-no">TOOL 09</span><span class="card-ico">＋</span></div>
+        <div class="card-body"><h3 data-t="t9_h">Coming next</h3><p data-t="t9_p"></p><div class="card-tag" data-t="t9_tag"></div></div>
       </button>
     </div>
   </div>
@@ -252,6 +264,73 @@
     </section>
   </div>
 
+  <!-- CROP -->
+  <div class="view" id="view-crop">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t6_h">Image Cropper</h2><div class="meta" data-t="crop_meta">Drag the box · pick a ratio</div></div>
+      <div class="panel-body">
+        <div class="drop" id="drop-crop" tabindex="0" role="button" style="display:block"><div class="big" data-t="drop_big">Drop an image here</div><div class="sub" data-t="drop_sub">or click / tap to choose a file</div><input type="file" id="file-crop" accept="image/png,image/jpeg,image/webp,image/bmp" hidden></div>
+        <div id="crop-work" style="display:none">
+          <div class="controls" style="margin-top:16px">
+            <div class="ctrl"><label data-t="l_ratio">Aspect ratio</label>
+              <select id="crop-ratio"><option value="free" data-t="opt_free">Free</option><option value="1">1 : 1</option><option value="0.8">4 : 5</option><option value="1.25">5 : 4</option><option value="1.7777">16 : 9</option><option value="0.5625">9 : 16</option><option value="1.3333">4 : 3</option></select></div>
+            <div class="ctrl"><label data-t="l_output">Output</label><select id="crop-fmt"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option></select></div>
+            <div class="ctrl"><label>&nbsp;</label><button class="ghost" id="crop-reset" data-t="reset">Reset box</button></div>
+          </div>
+          <div id="crop-stage" style="position:relative;display:inline-block;max-width:100%;border:1.5px solid var(--ink);background:repeating-conic-gradient(#c9bfa6 0% 25%,#d8cfba 0% 50%) 50%/16px 16px;touch-action:none;user-select:none">
+            <img id="crop-img" style="display:block;max-width:100%;pointer-events:none" alt="">
+            <div id="crop-box" style="position:absolute;border:2px solid var(--rust);box-shadow:0 0 0 9999px rgba(22,20,15,.5);cursor:move">
+              <div class="crop-h" data-h="nw" style="position:absolute;width:14px;height:14px;background:var(--rust);border:1px solid #fff;top:-8px;left:-8px;cursor:nwse-resize"></div>
+              <div class="crop-h" data-h="ne" style="position:absolute;width:14px;height:14px;background:var(--rust);border:1px solid #fff;top:-8px;right:-8px;cursor:nesw-resize"></div>
+              <div class="crop-h" data-h="sw" style="position:absolute;width:14px;height:14px;background:var(--rust);border:1px solid #fff;bottom:-8px;left:-8px;cursor:nesw-resize"></div>
+              <div class="crop-h" data-h="se" style="position:absolute;width:14px;height:14px;background:var(--rust);border:1px solid #fff;bottom:-8px;right:-8px;cursor:nwse-resize"></div>
+            </div>
+          </div>
+          <div class="actions"><button class="go" id="crop-dl" data-t="crop_dl">Crop &amp; download</button><button class="ghost" id="crop-new" data-t="crop_new">New image</button><span class="stat" id="stat-crop"></span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- FAVICON -->
+  <div class="view" id="view-favicon">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t7_h">Favicon Generator</h2><div class="meta" data-t="fav_meta">One image → all icon sizes</div></div>
+      <div class="panel-body">
+        <div class="drop" id="drop-fav" tabindex="0" role="button" style="display:block"><div class="big" data-t="fav_drop">Drop a square image here</div><div class="sub" data-t="drop_sub">or click / tap to choose a file</div><div class="cap"><span data-t="fav_hint">Best with a square PNG, 512px or larger</span></div><input type="file" id="file-fav" accept="image/png,image/jpeg,image/webp" hidden></div>
+        <div id="fav-work" style="display:none">
+          <div class="controls" style="margin-top:16px">
+            <div class="ctrl"><label data-t="l_bgmode">Background</label><select id="fav-bg"><option value="keep" data-t="opt_transparent">Transparent</option><option value="fill" data-t="opt_fill">Fill color</option></select></div>
+            <div class="ctrl" id="fav-color-wrap" style="display:none"><label data-t="l_bg">Color</label><div class="swatch"><input type="color" id="fav-color" value="#ffffff"></div></div>
+          </div>
+          <div id="fav-preview" class="grid" style="margin-top:6px"></div>
+          <p class="note" data-t="fav_note">Generates PNG icons at 16, 32, 48, 180 (Apple), 192 and 512 px, plus a favicon.ico and a ready-to-paste HTML snippet — all in one zip.</p>
+          <div class="actions"><button class="go" id="fav-dl" data-t="fav_dl">Generate &amp; download .zip</button><button class="ghost" id="fav-new" data-t="crop_new">New image</button><span class="stat" id="stat-fav"></span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- JSON -->
+  <div class="view" id="view-json">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t8_h">JSON Formatter</h2><div class="meta" data-t="json_meta">Format · validate · minify</div></div>
+      <div class="panel-body">
+        <div class="controls">
+          <div class="ctrl"><label data-t="l_indent">Indent</label><select id="json-indent"><option value="2">2 spaces</option><option value="4">4 spaces</option><option value="tab" data-t="opt_tab">Tab</option></select></div>
+          <div class="ctrl"><label>&nbsp;</label><button class="go" id="json-format" data-t="json_format" style="padding:8px 16px">Format</button></div>
+          <div class="ctrl"><label>&nbsp;</label><button class="ghost" id="json-min" data-t="json_min">Minify</button></div>
+          <div class="ctrl"><label>&nbsp;</label><button class="ghost" id="json-copy" data-t="copy">Copy</button></div>
+        </div>
+        <textarea id="json-in" spellcheck="false" placeholder='{"hello":"world","items":[1,2,3]}' style="width:100%;min-height:260px;border:1.5px solid var(--ink);background:var(--paper);font-family:'Courier New',monospace;font-size:13px;padding:12px;resize:vertical;line-height:1.5"></textarea>
+        <div class="actions"><span class="stat" id="stat-json"></span></div>
+      </div>
+    </section>
+  </div>
+
   <footer><span data-t="foot">The Bench by Supula · files are processed in your browser, not uploaded.</span></footer>
 </div>
 
@@ -268,9 +347,17 @@ const I18N={
     t3_h:"Image Compressor", t3_p:"Shrink file size with a quality slider. See how much you saved. Batch, one zip.", t3_tag:"Batch · Zip · Offline",
     t4_h:"QR Code Generator", t4_p:"Turn any text or link into a QR code. Pick colors and size, download PNG or SVG.", t4_tag:"Instant · Offline",
     t5_h:"Background Remover", t5_p:"AI cutout to transparent PNG, in your browser. Batch up to 20, download one zip.", t5_tag:"AI · One-time model load",
-    t6_h:"Coming next", t6_p:"Room for more. Crop, favicon maker, color picker — your call.", t6_tag:"Planned",
+    t6_h:"Image Cropper", t6_p:"Crop to any area with preset ratios (1:1, 16:9, 4:5). Download PNG, JPG or WebP.", t6_tag:"Interactive · Offline",
+    t7_h:"Favicon Generator", t7_p:"One image → every favicon size, an .ico, and the HTML snippet, all in one zip.", t7_tag:"Zip · Offline",
+    t8_h:"JSON Formatter", t8_p:"Format, validate and minify JSON. Clear error messages when it's invalid.", t8_tag:"Dev · Offline",
+    t9_h:"Coming next", t9_p:"Room for more. Color picker, PDF merge, base64 — your call.", t9_tag:"Planned",
     run_conv:"Convert & download .zip", run_resize:"Resize & download .zip", run_compress:"Compress & download .zip", run_bg:"Remove backgrounds",
     l_convto:"Convert to", conv_meta:"Any format → PNG · JPG · WebP", conv_in:"Accepts PNG, JPG, WebP, GIF, BMP, AVIF",
+    crop_meta:"Drag the box · pick a ratio", l_ratio:"Aspect ratio", opt_free:"Free", reset:"Reset box", crop_dl:"Crop & download", crop_new:"New image",
+    fav_meta:"One image → all icon sizes", fav_drop:"Drop a square image here", fav_hint:"Best with a square PNG, 512px or larger",
+    l_bgmode:"Background", opt_transparent:"Transparent", opt_fill:"Fill color", fav_dl:"Generate & download .zip",
+    fav_note:"Generates PNG icons at 16, 32, 48, 180 (Apple), 192 and 512 px, plus a favicon.ico and a ready-to-paste HTML snippet — all in one zip.",
+    json_meta:"Format · validate · minify", l_indent:"Indent", opt_tab:"Tab", json_format:"Format", json_min:"Minify", copy:"Copy",
     qr_meta:"Text or link → QR", l_qtext:"Text or URL", l_size:"Size (px)", l_fg:"Dark", l_bg:"Light",
     dl_png:"Download PNG", dl_svg:"Download SVG", qr_empty:"Type something to generate",
     qr_note:"Longer text makes a denser code that's harder to scan. Keep good contrast for reliable scanning.",
@@ -289,9 +376,17 @@ const I18N={
     t3_h:"画像圧縮", t3_p:"画質スライダーでファイルを軽量化。削減率も表示。一括、zip 1つ。", t3_tag:"一括 · Zip · オフライン",
     t4_h:"QRコード生成", t4_p:"テキストやリンクをQRコードに。色とサイズを選び、PNGかSVGで保存。", t4_tag:"即時 · オフライン",
     t5_h:"背景除去", t5_p:"AIでブラウザ内で透過PNGに切り抜き。最大20枚、zip 1つ。", t5_tag:"AI · モデル初回読込",
-    t6_h:"近日追加", t6_p:"まだ余白あり。切り抜き、ファビコン作成、カラーピッカーなど。", t6_tag:"予定",
+    t6_h:"画像切り抜き", t6_p:"任意の範囲で切り抜き。比率プリセット（1:1, 16:9, 4:5）対応。PNG・JPG・WebPで保存。", t6_tag:"操作式 · オフライン",
+    t7_h:"ファビコン生成", t7_p:"1枚の画像から全サイズのファビコン、.ico、HTMLスニペットをzip 1つで。", t7_tag:"Zip · オフライン",
+    t8_h:"JSON整形", t8_p:"JSONの整形・検証・圧縮。不正な場合はわかりやすいエラー表示。", t8_tag:"開発 · オフライン",
+    t9_h:"近日追加", t9_p:"まだ余白あり。カラーピッカー、PDF結合、base64など。", t9_tag:"予定",
     run_conv:"変換して .zip をDL", run_resize:"リサイズして .zip をDL", run_compress:"圧縮して .zip をDL", run_bg:"背景を除去",
     l_convto:"変換先", conv_meta:"どの形式でも → PNG · JPG · WebP", conv_in:"対応: PNG, JPG, WebP, GIF, BMP, AVIF",
+    crop_meta:"枠をドラッグ · 比率を選択", l_ratio:"アスペクト比", opt_free:"自由", reset:"枠をリセット", crop_dl:"切り抜いてDL", crop_new:"別の画像",
+    fav_meta:"1枚 → 全アイコンサイズ", fav_drop:"正方形の画像をドロップ", fav_hint:"512px以上の正方形PNGが最適",
+    l_bgmode:"背景", opt_transparent:"透過", opt_fill:"塗りつぶし色", fav_dl:"生成して .zip をDL",
+    fav_note:"16・32・48・180（Apple）・192・512px のPNGアイコンに加え、favicon.ico と貼り付け用HTMLスニペットを zip 1つで生成します。",
+    json_meta:"整形 · 検証 · 圧縮", l_indent:"インデント", opt_tab:"タブ", json_format:"整形", json_min:"圧縮", copy:"コピー",
     qr_meta:"テキスト/リンク → QR", l_qtext:"テキストまたはURL", l_size:"サイズ (px)", l_fg:"前景色", l_bg:"背景色",
     dl_png:"PNG をダウンロード", dl_svg:"SVG をダウンロード", qr_empty:"入力すると生成されます",
     qr_note:"文字数が多いほどコードが密になり読み取りにくくなります。コントラストを保つと安定して読めます。",
@@ -314,7 +409,7 @@ function applyLang(l){
 document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>applyLang(b.dataset.lang)));
 
 const landing=document.getElementById('landing');
-const views={img:'view-img',resize:'view-resize',compress:'view-compress',qr:'view-qr',bg:'view-bg'};
+const views={img:'view-img',resize:'view-resize',compress:'view-compress',qr:'view-qr',bg:'view-bg',crop:'view-crop',favicon:'view-favicon',json:'view-json'};
 function openTool(id){landing.classList.add('hidden');Object.values(views).forEach(v=>document.getElementById(v).classList.remove('active'));document.getElementById(views[id]).classList.add('active');location.hash=id;scrollTo({top:0,behavior:'smooth'});}
 function goHome(){landing.classList.remove('hidden');Object.values(views).forEach(v=>document.getElementById(v).classList.remove('active'));location.hash='';scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openTool(b.dataset.open)));
@@ -418,6 +513,116 @@ function uniqueName(used,base,ext){let n=`${base}.${ext}`;if(used[n]){used[n]++;
       try{const blob=await run(it.file);zip.file(uniqueName(used,it.file.name.replace(/\.[^.]+$/,'')+'-nobg','png'),blob);
         URL.revokeObjectURL(it.url);it.url=URL.createObjectURL(blob);it.state='done';it.newSize=blob.size;q.render();ok++;}catch(e){q.setState(it.id,'fail');}}
     if(ok){q.flash('zip…');const o=await zip.generateAsync({type:'blob',compression:'STORE'});dl(o,`bench-nobg-${ok}.zip`);q.flash(`<b>${ok}</b> ✓`);}else q.flash('—');q.lock(false);});})();
+
+/* ---------- Tool 06: Cropper ---------- */
+(()=>{
+  const drop=document.getElementById('drop-crop'),input=document.getElementById('file-crop'),work=document.getElementById('crop-work'),
+    stage=document.getElementById('crop-stage'),imgEl=document.getElementById('crop-img'),box=document.getElementById('crop-box'),
+    ratioSel=document.getElementById('crop-ratio'),fmtSel=document.getElementById('crop-fmt'),stat=document.getElementById('stat-crop');
+  let curFile=null,natW=0,natH=0;
+  drop.addEventListener('click',()=>input.click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{const f=[...e.dataTransfer.files].find(x=>x.type.startsWith('image/'));if(f)load(f);});
+  input.addEventListener('change',e=>{if(e.target.files[0])load(e.target.files[0]);input.value='';});
+  function load(f){curFile=f;const u=URL.createObjectURL(f);imgEl.onload=()=>{natW=imgEl.naturalWidth;natH=imgEl.naturalHeight;drop.style.display='none';work.style.display='block';resetBox();};imgEl.src=u;}
+  function resetBox(){const w=imgEl.clientWidth,h=imgEl.clientHeight;let bw=w*0.7,bh=h*0.7;const r=ratioSel.value;
+    if(r!=='free'){const ar=parseFloat(r);if(bw/bh>ar)bw=bh*ar;else bh=bw/ar;}
+    setBox((w-bw)/2,(h-bh)/2,bw,bh);}
+  function setBox(x,y,w,h){const mw=imgEl.clientWidth,mh=imgEl.clientHeight;
+    w=Math.max(20,Math.min(w,mw));h=Math.max(20,Math.min(h,mh));
+    x=Math.max(0,Math.min(x,mw-w));y=Math.max(0,Math.min(y,mh-h));
+    box.style.left=x+'px';box.style.top=y+'px';box.style.width=w+'px';box.style.height=h+'px';}
+  ratioSel.addEventListener('change',resetBox);
+  document.getElementById('crop-reset').addEventListener('click',resetBox);
+  // drag / resize
+  let mode=null,sx,sy,ox,oy,ow,oh,handle;
+  function pt(e){const t=e.touches?e.touches[0]:e;return{x:t.clientX,y:t.clientY};}
+  function down(e){const p=pt(e);sx=p.x;sy=p.y;ox=box.offsetLeft;oy=box.offsetTop;ow=box.offsetWidth;oh=box.offsetHeight;
+    if(e.target.classList.contains('crop-h')){mode='resize';handle=e.target.dataset.h;}else{mode='move';}e.preventDefault();}
+  function move(e){if(!mode)return;const p=pt(e),dx=p.x-sx,dy=p.y-sy,ar=ratioSel.value==='free'?null:parseFloat(ratioSel.value);
+    if(mode==='move'){setBox(ox+dx,oy+dy,ow,oh);}
+    else{let x=ox,y=oy,w=ow,h=oh;
+      if(handle==='se'){w=ow+dx;h=ar?w/ar:oh+dy;}
+      else if(handle==='sw'){w=ow-dx;x=ox+dx;h=ar?w/ar:oh+dy;}
+      else if(handle==='ne'){w=ow+dx;h=ar?w/ar:oh-dy;if(!ar)y=oy+dy;else y=oy+(oh-h);}
+      else{w=ow-dx;x=ox+dx;h=ar?w/ar:oh-dy;if(!ar)y=oy+dy;else y=oy+(oh-h);}
+      setBox(x,y,w,h);}
+    e.preventDefault();}
+  function up(){mode=null;}
+  box.addEventListener('mousedown',down);document.addEventListener('mousemove',move);document.addEventListener('mouseup',up);
+  box.addEventListener('touchstart',down,{passive:false});document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',up);
+  document.getElementById('crop-dl').addEventListener('click',()=>{
+    const scale=natW/imgEl.clientWidth;
+    const cx=box.offsetLeft*scale,cy=box.offsetTop*scale,cw=box.offsetWidth*scale,ch=box.offsetHeight*scale;
+    const c=document.createElement('canvas');c.width=Math.round(cw);c.height=Math.round(ch);const ctx=c.getContext('2d');
+    const type=fmtSel.value;if(type==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
+    ctx.drawImage(imgEl,cx,cy,cw,ch,0,0,c.width,c.height);
+    c.toBlob(b=>{if(b)dl(b,`${curFile.name.replace(/\.[^.]+$/,'')}-crop.${extOf(type)}`);stat.innerHTML='✓';},type,type==='image/png'?undefined:0.92);});
+  document.getElementById('crop-new').addEventListener('click',()=>{work.style.display='none';drop.style.display='block';stat.textContent='';});
+})();
+
+/* ---------- Tool 07: Favicon ---------- */
+(()=>{
+  const drop=document.getElementById('drop-fav'),input=document.getElementById('file-fav'),work=document.getElementById('fav-work'),
+    preview=document.getElementById('fav-preview'),bgSel=document.getElementById('fav-bg'),colorWrap=document.getElementById('fav-color-wrap'),
+    color=document.getElementById('fav-color'),stat=document.getElementById('stat-fav');
+  const SIZES=[16,32,48,180,192,512];let img=null,curFile=null;
+  drop.addEventListener('click',()=>input.click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{const f=[...e.dataTransfer.files].find(x=>x.type.startsWith('image/'));if(f)load(f);});
+  input.addEventListener('change',e=>{if(e.target.files[0])load(e.target.files[0]);input.value='';});
+  bgSel.addEventListener('change',()=>{colorWrap.style.display=bgSel.value==='fill'?'flex':'none';renderPreview();});
+  color.addEventListener('input',renderPreview);
+  function load(f){curFile=f;const im=new Image();im.onload=()=>{img=im;drop.style.display='none';work.style.display='block';renderPreview();};im.src=URL.createObjectURL(f);}
+  function iconCanvas(size){const c=document.createElement('canvas');c.width=size;c.height=size;const ctx=c.getContext('2d');
+    if(bgSel.value==='fill'){ctx.fillStyle=color.value;ctx.fillRect(0,0,size,size);}
+    const s=Math.min(img.naturalWidth,img.naturalHeight);const sx=(img.naturalWidth-s)/2,sy=(img.naturalHeight-s)/2;
+    ctx.imageSmoothingQuality='high';ctx.drawImage(img,sx,sy,s,s,0,0,size,size);return c;}
+  function renderPreview(){preview.innerHTML='';[16,32,48,180].forEach(sz=>{const c=iconCanvas(sz);
+    const card=document.createElement('div');card.className='card';card.style.padding='8px';card.style.textAlign='center';
+    c.style.width=Math.min(sz,64)+'px';c.style.height=Math.min(sz,64)+'px';c.style.imageRendering='pixelated';
+    const wrap=document.createElement('div');wrap.style.cssText='height:70px;display:flex;align-items:center;justify-content:center;background:repeating-conic-gradient(#c9bfa6 0% 25%,#d8cfba 0% 50%) 50%/12px 12px';
+    wrap.appendChild(c);card.appendChild(wrap);const lbl=document.createElement('div');lbl.className='info';lbl.textContent=sz+'px';card.appendChild(lbl);preview.appendChild(card);});}
+  function toBlob(c){return new Promise(r=>c.toBlob(r,'image/png'));}
+  // Minimal .ico builder (packs 16/32/48 PNGs)
+  async function buildIco(){const sizes=[16,32,48];const pngs=[];for(const s of sizes){const b=await toBlob(iconCanvas(s));pngs.push(new Uint8Array(await b.arrayBuffer()));}
+    const count=sizes.length;const header=6+count*16;let offset=header;const parts=[];
+    const head=new DataView(new ArrayBuffer(6));head.setUint16(0,0,true);head.setUint16(2,1,true);head.setUint16(4,count,true);parts.push(new Uint8Array(head.buffer));
+    const dir=new Uint8Array(count*16);let dv=new DataView(dir.buffer);
+    for(let i=0;i<count;i++){const s=sizes[i],png=pngs[i];const base=i*16;
+      dir[base]=s>=256?0:s;dir[base+1]=s>=256?0:s;dir[base+2]=0;dir[base+3]=0;
+      dv.setUint16(base+4,1,true);dv.setUint16(base+6,32,true);dv.setUint32(base+8,png.length,true);dv.setUint32(base+12,offset,true);offset+=png.length;}
+    parts.push(dir);pngs.forEach(p=>parts.push(p));return new Blob(parts,{type:'image/x-icon'});}
+  document.getElementById('fav-dl').addEventListener('click',async()=>{stat.innerHTML='…';const zip=new JSZip();
+    for(const s of SIZES){const b=await toBlob(iconCanvas(s));zip.file(s===180?`apple-touch-icon.png`:`favicon-${s}x${s}.png`,b);}
+    zip.file('favicon.ico',await buildIco());
+    const html=`<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">`;
+    zip.file('paste-into-head.html',html);
+    const o=await zip.generateAsync({type:'blob',compression:'STORE'});dl(o,'bench-favicons.zip');stat.innerHTML='✓';});
+  document.getElementById('fav-new').addEventListener('click',()=>{work.style.display='none';drop.style.display='block';stat.textContent='';});
+})();
+
+/* ---------- Tool 08: JSON Formatter ---------- */
+(()=>{
+  const ta=document.getElementById('json-in'),indent=document.getElementById('json-indent'),stat=document.getElementById('stat-json');
+  function getIndent(){return indent.value==='tab'?'\t':parseInt(indent.value,10);}
+  function parseOrShow(){try{return{ok:true,val:JSON.parse(ta.value)};}catch(e){
+    let loc='';const lc=/line (\d+) column (\d+)/i.exec(e.message);const pm=/position (\d+)/.exec(e.message);
+    if(lc){loc=LANG==='ja'?` (${lc[1]}行 ${lc[2]}列付近)`:` (near line ${lc[1]}, col ${lc[2]})`;}
+    else if(pm){const pos=+pm[1];const before=ta.value.slice(0,pos);const line=before.split('\n').length;const col=pos-before.lastIndexOf('\n');loc=LANG==='ja'?` (${line}行 ${col}列付近)`:` (near line ${line}, col ${col})`;}
+    stat.innerHTML=`<span style="color:var(--rust)">✕ ${LANG==='ja'?'無効なJSON':'Invalid JSON'}${loc}</span>`;return{ok:false};}}
+  document.getElementById('json-format').addEventListener('click',()=>{const r=parseOrShow();if(r.ok){ta.value=JSON.stringify(r.val,null,getIndent());stat.innerHTML=`<span>✓ ${LANG==='ja'?'整形しました':'Valid & formatted'}</span>`;}});
+  document.getElementById('json-min').addEventListener('click',()=>{const r=parseOrShow();if(r.ok){ta.value=JSON.stringify(r.val);stat.innerHTML=`<span>✓ ${LANG==='ja'?'圧縮しました':'Minified'}</span>`;}});
+  document.getElementById('json-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(ta.value);stat.innerHTML=`<span>✓ ${LANG==='ja'?'コピーしました':'Copied'}</span>`;}catch(e){stat.textContent='—';}});
+})();
 
 applyLang('en');
 if(location.hash&&views[location.hash.slice(1)])openTool(location.hash.slice(1));
