@@ -3,200 +3,105 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bench — Tool Hub</title>
+<title>The Bench — Browser Tools</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
-    --ink:#16140f;
-    --paper:#e9e3d4;
-    --paper-2:#ddd5c2;
-    --line:#bcb29a;
-    --rust:#b1471f;
-    --rust-deep:#8a3414;
-    --moss:#4f5d3a;
-    --grid:#cfc6b0;
+    --ink:#16140f; --paper:#e9e3d4; --paper-2:#ddd5c2; --line:#bcb29a;
+    --rust:#b1471f; --rust-deep:#8a3414; --moss:#4f5d3a; --grid:#cfc6b0;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
   body{
-    background:var(--paper);
-    color:var(--ink);
+    background:var(--paper); color:var(--ink);
     font-family:"Courier New",ui-monospace,monospace;
-    background-image:
-      linear-gradient(var(--grid) 1px,transparent 1px),
-      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-    background-size:28px 28px;
-    min-height:100vh;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:28px 28px; min-height:100vh;
   }
-  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+  .wrap{max-width:900px;margin:0 auto;padding:32px 20px 80px}
 
-  /* Masthead */
-  header{
-    border:2px solid var(--ink);
-    background:var(--paper-2);
-    padding:18px 20px;
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:16px;
-    flex-wrap:wrap;
-  }
-  .brand{
-    font-family:Georgia,"Times New Roman",serif;
-    font-weight:700;
-    font-size:34px;
-    letter-spacing:-.5px;
-  }
+  header{border:2px solid var(--ink);background:var(--paper-2);padding:18px 20px;display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand{font-family:Georgia,serif;font-weight:700;font-size:34px;letter-spacing:-.5px}
   .brand b{color:var(--rust)}
-  .tagline{
-    font-size:12px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:var(--moss);
-  }
+  .tagline{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--moss)}
 
-  /* Tool index */
-  .index{
-    margin-top:18px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+  /* ---- Landing grid ---- */
+  .lead{margin:24px 2px 18px;font-size:13px;color:var(--moss);letter-spacing:1px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+  .card-tool{
+    border:2px solid var(--ink);background:var(--paper-2);padding:0;text-align:left;
+    cursor:pointer;display:flex;flex-direction:column;box-shadow:4px 4px 0 var(--ink);
+    transition:transform .08s,box-shadow .08s;font-family:inherit;
   }
-  .tab{
-    border:1.5px solid var(--ink);
-    background:transparent;
-    padding:8px 14px;
-    font-family:"Courier New",monospace;
-    font-size:13px;
-    cursor:pointer;
-    display:flex;
-    gap:8px;
-    align-items:center;
-    transition:background .12s,color .12s;
-  }
-  .tab .no{color:var(--rust);font-weight:700}
-  .tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
-  .tab[aria-selected="true"] .no{color:var(--paper-2)}
-  .tab[disabled]{opacity:.45;cursor:not-allowed}
+  .card-tool:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .card-tool:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .card-tool[disabled]{opacity:.5;cursor:not-allowed;box-shadow:4px 4px 0 var(--line)}
+  .card-tool[disabled]:hover{transform:none;box-shadow:4px 4px 0 var(--line)}
+  .card-top{padding:16px 16px 10px;border-bottom:1.5px solid var(--ink);display:flex;justify-content:space-between;align-items:flex-start}
+  .card-no{font-size:12px;color:var(--rust);font-weight:700;letter-spacing:1px}
+  .card-ico{font-size:26px;line-height:1}
+  .card-body{padding:14px 16px 16px}
+  .card-body h3{font-family:Georgia,serif;font-size:19px;margin-bottom:6px}
+  .card-body p{font-size:12px;line-height:1.55;color:var(--moss)}
+  .card-tag{margin-top:12px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--rust)}
 
-  /* Panel */
-  .panel{
-    margin-top:22px;
-    border:2px solid var(--ink);
-    background:var(--paper-2);
-  }
-  .panel-head{
-    border-bottom:1.5px solid var(--ink);
-    padding:14px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .panel-head h2{
-    font-family:Georgia,serif;
-    font-size:22px;
-    font-weight:700;
-  }
+  /* ---- Tool view ---- */
+  .view{display:none}
+  .view.active{display:block}
+  .landing.hidden{display:none}
+  .backbar{margin:22px 0 0}
+  .back{font-family:inherit;font-size:13px;border:1.5px solid var(--ink);background:transparent;padding:8px 14px;cursor:pointer}
+  .back:hover{background:var(--ink);color:var(--paper)}
+
+  .panel{margin-top:16px;border:2px solid var(--ink);background:var(--paper-2)}
+  .panel-head{border-bottom:1.5px solid var(--ink);padding:14px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .panel-head h2{font-family:Georgia,serif;font-size:22px}
   .panel-head .meta{font-size:12px;color:var(--moss);letter-spacing:1px}
   .panel-body{padding:20px}
 
-  /* Controls row */
-  .controls{
-    display:flex;
-    gap:18px;
-    align-items:center;
-    flex-wrap:wrap;
-    margin-bottom:16px;
-  }
+  .controls{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
   .ctrl{display:flex;flex-direction:column;gap:6px;font-size:12px}
   .ctrl label{letter-spacing:1px;text-transform:uppercase;color:var(--moss)}
-  select,input[type=range]{
-    font-family:inherit;
-    accent-color:var(--rust);
-  }
-  select{
-    border:1.5px solid var(--ink);
-    background:var(--paper);
-    padding:6px 8px;
-    font-size:13px;
-  }
+  select{border:1.5px solid var(--ink);background:var(--paper);padding:6px 8px;font-size:13px;font-family:inherit}
+  input[type=range]{accent-color:var(--rust)}
   .qual{display:flex;align-items:center;gap:10px}
   .qual output{font-weight:700;color:var(--rust);min-width:34px;text-align:right}
 
-  /* Dropzone */
-  .drop{
-    border:2px dashed var(--line);
-    background:var(--paper);
-    padding:38px 20px;
-    text-align:center;
-    cursor:pointer;
-    transition:border-color .15s,background .15s;
-  }
+  .drop{border:2px dashed var(--line);background:var(--paper);padding:38px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
   .drop:hover,.drop.over{border-color:var(--rust);background:#efe9da}
   .drop .big{font-family:Georgia,serif;font-size:18px;margin-bottom:6px}
   .drop .sub{font-size:12px;color:var(--moss)}
   .drop .cap{margin-top:10px;font-size:11px;letter-spacing:1px}
   .drop .cap b{color:var(--rust)}
 
-  /* Queue */
   .queue{margin-top:18px;display:none}
-  .qhead{
-    display:flex;justify-content:space-between;align-items:center;
-    border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:12px;
-    font-size:12px;letter-spacing:1px;text-transform:uppercase;
-  }
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-    gap:12px;
-  }
-  .card{
-    border:1.5px solid var(--ink);
-    background:var(--paper);
-    overflow:hidden;
-    position:relative;
-  }
-  .thumb{height:84px;background:#cfc6b0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .qhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:12px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+  .card{border:1.5px solid var(--ink);background:var(--paper);overflow:hidden;position:relative}
+  .thumb{height:84px;background:
+    repeating-conic-gradient(#c9bfa6 0% 25%,#d8cfba 0% 50%) 50%/16px 16px;
+    display:flex;align-items:center;justify-content:center;overflow:hidden}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .card .info{padding:6px 8px;font-size:11px;line-height:1.45}
   .card .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .card .size{color:var(--moss)}
-  .card .size .arr{color:var(--rust)}
-  .card .x{
-    position:absolute;top:4px;right:4px;
-    width:20px;height:20px;border:1px solid var(--ink);
-    background:var(--paper);font-size:12px;line-height:1;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
-  }
+  .card .x{position:absolute;top:4px;right:4px;width:20px;height:20px;border:1px solid var(--ink);background:var(--paper);font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .card .x:hover{background:var(--rust);color:var(--paper)}
-  .badge{position:absolute;top:4px;left:4px;background:var(--moss);color:var(--paper);font-size:9px;padding:2px 5px;letter-spacing:1px}
+  .card .state{position:absolute;top:4px;left:4px;font-size:9px;padding:2px 5px;letter-spacing:1px;background:var(--moss);color:var(--paper)}
+  .card .state.working{background:var(--rust)}
+  .card .state.done{background:var(--ink)}
 
-  /* Actions */
   .actions{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  button.go{
-    font-family:"Courier New",monospace;
-    font-size:14px;letter-spacing:1px;text-transform:uppercase;
-    border:2px solid var(--ink);
-    background:var(--rust);color:var(--paper);
-    padding:11px 22px;cursor:pointer;
-    box-shadow:3px 3px 0 var(--ink);
-    transition:transform .08s,box-shadow .08s,background .12s;
-  }
+  button.go{font-family:inherit;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:2px solid var(--ink);background:var(--rust);color:var(--paper);padding:11px 22px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s,background .12s}
   button.go:hover{background:var(--rust-deep)}
   button.go:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
   button.go:disabled{background:var(--line);cursor:not-allowed;box-shadow:3px 3px 0 var(--line);color:var(--paper-2)}
-  button.ghost{
-    font-family:"Courier New",monospace;font-size:13px;
-    border:1.5px solid var(--ink);background:transparent;
-    padding:10px 16px;cursor:pointer;
-  }
+  button.ghost{font-family:inherit;font-size:13px;border:1.5px solid var(--ink);background:transparent;padding:10px 16px;cursor:pointer}
   button.ghost:hover{background:var(--ink);color:var(--paper)}
   .stat{font-size:12px;color:var(--moss);letter-spacing:1px}
   .stat b{color:var(--rust)}
+  .note{margin-top:14px;font-size:11px;color:var(--moss);line-height:1.6;border-left:3px solid var(--line);padding-left:12px}
 
-  .soon{font-size:13px;color:var(--moss);padding:30px 0;text-align:center;line-height:1.7}
   footer{margin-top:30px;font-size:11px;color:var(--moss);letter-spacing:1px;text-align:center}
   @media(max-width:520px){.brand{font-size:26px}.panel-head h2{font-size:19px}}
 </style>
@@ -211,190 +116,237 @@
     <div class="tagline">No&nbsp;upload · runs&nbsp;in&nbsp;your&nbsp;browser</div>
   </header>
 
-  <nav class="index" role="tablist" aria-label="Tools">
-    <button class="tab" role="tab" aria-selected="true" data-tool="img"><span class="no">01</span> Image → WebP</button>
-    <button class="tab" role="tab" aria-selected="false" disabled><span class="no">02</span> Next tool…</button>
-  </nav>
-
-  <section class="panel" id="tool-img">
-    <div class="panel-head">
-      <h2>Image to WebP</h2>
-      <div class="meta">PNG · JPG · GIF → WEBP</div>
-    </div>
-    <div class="panel-body">
-      <div class="controls">
-        <div class="ctrl">
-          <label for="fmt">Output</label>
-          <select id="fmt">
-            <option value="image/webp" selected>WebP</option>
-            <option value="image/jpeg">JPEG</option>
-            <option value="image/png">PNG</option>
-          </select>
+  <!-- LANDING -->
+  <div class="landing" id="landing">
+    <p class="lead">Pick a tool. Everything runs locally — your files never leave this page.</p>
+    <div class="cards">
+      <button class="card-tool" data-open="img">
+        <div class="card-top"><span class="card-no">TOOL 01</span><span class="card-ico">🖼</span></div>
+        <div class="card-body">
+          <h3>Image → WebP</h3>
+          <p>Convert PNG, JPG or GIF to WebP (or JPEG/PNG). Batch up to 30, download one zip.</p>
+          <div class="card-tag">Batch · Zip</div>
         </div>
-        <div class="ctrl">
-          <label for="q">Quality</label>
-          <div class="qual">
-            <input type="range" id="q" min="10" max="100" value="80" step="5">
-            <output id="qv">80</output>
+      </button>
+
+      <button class="card-tool" data-open="bg">
+        <div class="card-top"><span class="card-no">TOOL 02</span><span class="card-ico">✂️</span></div>
+        <div class="card-body">
+          <h3>Background Remover</h3>
+          <p>AI cutout to transparent PNG, right in the browser. Batch up to 20, download one zip.</p>
+          <div class="card-tag">AI · Offline after load</div>
+        </div>
+      </button>
+
+      <button class="card-tool" disabled>
+        <div class="card-top"><span class="card-no">TOOL 03</span><span class="card-ico">＋</span></div>
+        <div class="card-body">
+          <h3>Coming next</h3>
+          <p>Room for more. Resize, compress, crop, favicon maker — your call.</p>
+          <div class="card-tag">Planned</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOOL 01: WEBP -->
+  <div class="view" id="view-img">
+    <div class="backbar"><button class="back" data-back>← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2>Image to WebP</h2><div class="meta">PNG · JPG · GIF → WEBP</div></div>
+      <div class="panel-body">
+        <div class="controls">
+          <div class="ctrl"><label for="fmt">Output</label>
+            <select id="fmt">
+              <option value="image/webp" selected>WebP</option>
+              <option value="image/jpeg">JPEG</option>
+              <option value="image/png">PNG</option>
+            </select>
+          </div>
+          <div class="ctrl"><label for="q">Quality</label>
+            <div class="qual"><input type="range" id="q" min="10" max="100" value="80" step="5"><output id="qv">80</output></div>
           </div>
         </div>
-      </div>
-
-      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Add images">
-        <div class="big">Drop images here</div>
-        <div class="sub">or click / tap to choose files</div>
-        <div class="cap">Up to <b>30</b> images per batch · downloaded as one <b>.zip</b></div>
-        <input type="file" id="file" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" multiple hidden>
-      </div>
-
-      <div class="queue" id="queue">
-        <div class="qhead">
-          <span>Queue · <span id="count">0</span>/30</span>
-          <button class="ghost" id="clear">Clear all</button>
+        <div class="drop" id="drop-img" tabindex="0" role="button" aria-label="Add images">
+          <div class="big">Drop images here</div>
+          <div class="sub">or click / tap to choose files</div>
+          <div class="cap">Up to <b>30</b> images · downloaded as one <b>.zip</b></div>
+          <input type="file" id="file-img" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" multiple hidden>
         </div>
-        <div class="grid" id="grid"></div>
+        <div class="queue" id="queue-img">
+          <div class="qhead"><span>Queue · <span id="count-img">0</span>/30</span><button class="ghost" id="clear-img">Clear all</button></div>
+          <div class="grid" id="grid-img"></div>
+        </div>
+        <div class="actions"><button class="go" id="run-img" disabled>Convert &amp; download .zip</button><span class="stat" id="stat-img"></span></div>
       </div>
+    </section>
+  </div>
 
-      <div class="actions">
-        <button class="go" id="convert" disabled>Convert &amp; download .zip</button>
-        <span class="stat" id="stat"></span>
+  <!-- TOOL 02: BACKGROUND REMOVER -->
+  <div class="view" id="view-bg">
+    <div class="backbar"><button class="back" data-back>← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2>Background Remover</h2><div class="meta">AI cutout → transparent PNG</div></div>
+      <div class="panel-body">
+        <div class="drop" id="drop-bg" tabindex="0" role="button" aria-label="Add images">
+          <div class="big">Drop images here</div>
+          <div class="sub">or click / tap to choose files</div>
+          <div class="cap">Up to <b>20</b> images · downloaded as one <b>.zip</b></div>
+          <input type="file" id="file-bg" accept="image/png,image/jpeg,image/webp" multiple hidden>
+        </div>
+        <div class="queue" id="queue-bg">
+          <div class="qhead"><span>Queue · <span id="count-bg">0</span>/20</span><button class="ghost" id="clear-bg">Clear all</button></div>
+          <div class="grid" id="grid-bg"></div>
+        </div>
+        <div class="actions"><button class="go" id="run-bg" disabled>Remove backgrounds</button><span class="stat" id="stat-bg"></span></div>
+        <p class="note">First run downloads a one-time AI model (~40&nbsp;MB), then it's cached and works offline. Processing happens entirely on your device. Best with clear subjects — people, products, animals.</p>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <footer>Files never leave your device — everything is processed locally.</footer>
+  <footer>The Bench · files are processed locally and never uploaded.</footer>
 </div>
 
-<script>
-const MAX = 30;
-const fileInput = document.getElementById('file');
-const drop = document.getElementById('drop');
-const grid = document.getElementById('grid');
-const queue = document.getElementById('queue');
-const countEl = document.getElementById('count');
-const convertBtn = document.getElementById('convert');
-const clearBtn = document.getElementById('clear');
-const statEl = document.getElementById('stat');
-const fmtSel = document.getElementById('fmt');
-const qSlider = document.getElementById('q');
-const qOut = document.getElementById('qv');
+<script type="module">
+/* ---------- Routing ---------- */
+const landing = document.getElementById('landing');
+const views = { img: document.getElementById('view-img'), bg: document.getElementById('view-bg') };
+function openTool(id){
+  landing.classList.add('hidden');
+  Object.values(views).forEach(v=>v.classList.remove('active'));
+  views[id].classList.add('active');
+  location.hash = id;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){
+  landing.classList.remove('hidden');
+  Object.values(views).forEach(v=>v.classList.remove('active'));
+  location.hash = '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openTool(b.dataset.open)));
+document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',goHome));
+if(location.hash && views[location.hash.slice(1)]) openTool(location.hash.slice(1));
 
-let items = []; // {id, file, url}
-let uid = 0;
+/* ---------- Shared helpers ---------- */
+const fmtBytes = b => b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
 
-qSlider.addEventListener('input', () => qOut.textContent = qSlider.value);
+function makeQueue(cfg){
+  let items=[], uid=0;
+  const grid=document.getElementById(cfg.grid), queue=document.getElementById(cfg.queue),
+        countEl=document.getElementById(cfg.count), runBtn=document.getElementById(cfg.run),
+        stat=document.getElementById(cfg.stat), drop=document.getElementById(cfg.drop),
+        input=document.getElementById(cfg.input), clearBtn=document.getElementById(cfg.clear);
 
-const fmtBytes = b => b < 1024 ? b+' B' : b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(2)+' MB';
-const extFor = m => ({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'})[m] || 'img';
+  drop.addEventListener('click',()=>input.click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+  input.addEventListener('change',e=>{add(e.target.files);input.value='';});
+  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>add(e.dataTransfer.files));
+  clearBtn.addEventListener('click',()=>{items.forEach(i=>URL.revokeObjectURL(i.url));items=[];render();flash('');});
 
-drop.addEventListener('click', () => fileInput.click());
-drop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();} });
-fileInput.addEventListener('change', e => addFiles(e.target.files));
-
-['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault();drop.classList.add('over');}));
-['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault();drop.classList.remove('over');}));
-drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
-
-function addFiles(list){
-  const incoming = [...list].filter(f => f.type.startsWith('image/'));
-  let added = 0, skipped = 0;
-  for(const f of incoming){
-    if(items.length >= MAX){ skipped++; continue; }
-    const id = ++uid;
-    const url = URL.createObjectURL(f);
-    items.push({id, file:f, url});
-    added++;
+  function add(list){
+    const imgs=[...list].filter(f=>f.type.startsWith('image/'));
+    let added=0,skip=0;
+    for(const f of imgs){
+      if(items.length>=cfg.max){skip++;continue;}
+      items.push({id:++uid,file:f,url:URL.createObjectURL(f),state:null});added++;
+    }
+    render();
+    flash(skip?`Added ${added}. Limit ${cfg.max} — ${skip} skipped.`:added?`Added ${added} image${added>1?'s':''}.`:'');
   }
-  render();
-  if(skipped > 0) flash(`Added ${added}. Limit is ${MAX} — ${skipped} not added.`);
-  else if(added) flash(`Added ${added} image${added>1?'s':''}.`);
-  fileInput.value = '';
-}
-
-function removeItem(id){
-  const it = items.find(i=>i.id===id);
-  if(it) URL.revokeObjectURL(it.url);
-  items = items.filter(i=>i.id!==id);
-  render();
-}
-
-clearBtn.addEventListener('click', () => {
-  items.forEach(i => URL.revokeObjectURL(i.url));
-  items = []; render(); flash('');
-});
-
-function render(){
-  countEl.textContent = items.length;
-  queue.style.display = items.length ? 'block' : 'none';
-  convertBtn.disabled = items.length === 0;
-  grid.innerHTML = '';
-  for(const it of items){
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="thumb"><img src="${it.url}" alt=""></div>
-      <div class="x" title="Remove">✕</div>
-      <div class="info">
-        <div class="name">${it.file.name}</div>
-        <div class="size">${fmtBytes(it.file.size)}</div>
-      </div>`;
-    card.querySelector('.x').addEventListener('click', () => removeItem(it.id));
-    grid.appendChild(card);
+  function remove(id){const it=items.find(i=>i.id===id);if(it)URL.revokeObjectURL(it.url);items=items.filter(i=>i.id!==id);render();}
+  function render(){
+    countEl.textContent=items.length;
+    queue.style.display=items.length?'block':'none';
+    runBtn.disabled=items.length===0;
+    grid.innerHTML='';
+    for(const it of items){
+      const card=document.createElement('div');card.className='card';
+      const badge=it.state?`<div class="state ${it.state}">${it.state}</div>`:'';
+      card.innerHTML=`<div class="thumb"><img src="${it.url}" alt=""></div>${badge}
+        <div class="x" title="Remove">✕</div>
+        <div class="info"><div class="name">${it.file.name}</div><div class="size">${fmtBytes(it.file.size)}</div></div>`;
+      card.querySelector('.x').addEventListener('click',()=>remove(it.id));
+      grid.appendChild(card);
+    }
   }
+  function flash(m){stat.innerHTML=m;}
+  return {getItems:()=>items,render,flash,runBtn,setState:(id,s)=>{const it=items.find(i=>i.id===id);if(it){it.state=s;render();}},lock:v=>{runBtn.disabled=v;clearBtn.disabled=v;}};
 }
 
-function flash(msg){ statEl.innerHTML = msg; }
-
-function convertOne(file, type, quality){
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      const ctx = c.getContext('2d');
-      if(type === 'image/jpeg'){ ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height); }
-      ctx.drawImage(img,0,0);
-      c.toBlob(b => b ? resolve(b) : reject(new Error('encode failed')), type, quality);
-    };
-    img.onerror = () => reject(new Error('decode failed'));
-    img.src = URL.createObjectURL(file);
+/* ---------- Tool 01: WebP ---------- */
+(()=>{
+  const q=makeQueue({grid:'grid-img',queue:'queue-img',count:'count-img',run:'run-img',stat:'stat-img',drop:'drop-img',input:'file-img',clear:'clear-img',max:30});
+  const fmtSel=document.getElementById('fmt'),qSlider=document.getElementById('q'),qOut=document.getElementById('qv');
+  qSlider.addEventListener('input',()=>qOut.textContent=qSlider.value);
+  const extFor=m=>({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'})[m]||'img';
+  function convertOne(file,type,quality){
+    return new Promise((res,rej)=>{
+      const img=new Image();
+      img.onload=()=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+        const ctx=c.getContext('2d');
+        if(type==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
+        ctx.drawImage(img,0,0);c.toBlob(b=>b?res(b):rej(),type,quality);};
+      img.onerror=()=>rej();img.src=URL.createObjectURL(file);
+    });
+  }
+  q.runBtn.addEventListener('click',async()=>{
+    const items=q.getItems();if(!items.length)return;
+    const type=fmtSel.value,quality=parseInt(qSlider.value,10)/100,ext=extFor(type);
+    q.lock(true);const zip=new JSZip(),used={};let orig=0,neu=0,done=0;
+    for(const it of items){
+      q.flash(`Converting ${++done}/${items.length}…`);
+      try{const blob=await convertOne(it.file,type,quality);
+        let base=it.file.name.replace(/\.[^.]+$/,''),name=`${base}.${ext}`;
+        if(used[name]){used[name]++;name=`${base}-${used[name]}.${ext}`;}else used[name]=1;
+        zip.file(name,blob);orig+=it.file.size;neu+=blob.size;}catch(e){}
+    }
+    q.flash('Packing .zip…');
+    const out=await zip.generateAsync({type:'blob',compression:'STORE'});
+    dl(out,`bench-${ext}-${items.length}.zip`);
+    const saved=orig?Math.max(0,Math.round((1-neu/orig)*100)):0;
+    q.flash(`Done — <b>${items.length}</b> files · ${fmtBytes(orig)} → ${fmtBytes(neu)} (saved ${saved}%)`);
+    q.lock(false);
   });
-}
+})();
 
-convertBtn.addEventListener('click', async () => {
-  if(!items.length) return;
-  const type = fmtSel.value;
-  const quality = parseInt(qSlider.value,10)/100;
-  const ext = extFor(type);
-  convertBtn.disabled = true; clearBtn.disabled = true;
-  const zip = new JSZip();
-  const used = {};
-  let origTotal = 0, newTotal = 0, done = 0;
-
-  for(const it of items){
-    flash(`Converting ${++done}/${items.length}…`);
-    try{
-      const blob = await convertOne(it.file, type, quality);
-      let base = it.file.name.replace(/\.[^.]+$/,'');
-      let name = `${base}.${ext}`;
-      if(used[name]){ used[name]++; name = `${base}-${used[name]}.${ext}`; } else { used[name]=1; }
-      zip.file(name, blob);
-      origTotal += it.file.size; newTotal += blob.size;
-    }catch(err){ /* skip bad file */ }
+/* ---------- Tool 02: Background Remover ---------- */
+(()=>{
+  const q=makeQueue({grid:'grid-bg',queue:'queue-bg',count:'count-bg',run:'run-bg',stat:'stat-bg',drop:'drop-bg',input:'file-bg',clear:'clear-bg',max:20});
+  let remover=null;
+  async function loadLib(){
+    if(remover)return remover;
+    q.flash('Loading AI model…');
+    const mod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
+    remover=mod.removeBackground||mod.default;
+    return remover;
   }
+  q.runBtn.addEventListener('click',async()=>{
+    const items=q.getItems();if(!items.length)return;
+    q.lock(true);
+    let fn;
+    try{fn=await loadLib();}catch(e){q.flash('Could not load the AI model — check your connection.');q.lock(false);return;}
+    const zip=new JSZip(),used={};let done=0,ok=0;
+    for(const it of items){
+      q.setState(it.id,'working');q.flash(`Removing ${++done}/${items.length}…`);
+      try{
+        const blob=await fn(it.file);
+        let base=it.file.name.replace(/\.[^.]+$/,''),name=`${base}-nobg.png`;
+        if(used[name]){used[name]++;name=`${base}-nobg-${used[name]}.png`;}else used[name]=1;
+        zip.file(name,blob);
+        it.url=URL.createObjectURL(blob);it.state='done';q.render();ok++;
+      }catch(e){q.setState(it.id,'fail');}
+    }
+    if(ok){q.flash('Packing .zip…');const out=await zip.generateAsync({type:'blob',compression:'STORE'});
+      dl(out,`bench-nobg-${ok}.zip`);q.flash(`Done — <b>${ok}</b> cutout${ok>1?'s':''} saved.`);}
+    else q.flash('No images could be processed.');
+    q.lock(false);
+  });
+})();
 
-  flash('Packing .zip…');
-  const out = await zip.generateAsync({type:'blob', compression:'STORE'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(out);
-  a.download = `bench-${ext}-${items.length}.zip`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-
-  const saved = origTotal ? Math.max(0, Math.round((1-newTotal/origTotal)*100)) : 0;
-  flash(`Done — <b>${items.length}</b> files · ${fmtBytes(origTotal)} → ${fmtBytes(newTotal)} (saved ${saved}%)`);
-  convertBtn.disabled = false; clearBtn.disabled = false;
-});
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
 </script>
 </body>
 </html>
