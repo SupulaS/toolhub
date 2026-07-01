@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Bench — Browser Tools</title>
+<title>The Bench by Supula — Browser Tools</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <style>
   :root{
     --ink:#16140f; --paper:#e9e3d4; --paper-2:#ddd5c2; --line:#bcb29a;
@@ -18,21 +19,22 @@
     background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
     background-size:28px 28px; min-height:100vh;
   }
+  html[lang="ja"] body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,"Courier New",monospace}
   .wrap{max-width:900px;margin:0 auto;padding:32px 20px 80px}
 
-  header{border:2px solid var(--ink);background:var(--paper-2);padding:18px 20px;display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .brand{font-family:Georgia,serif;font-weight:700;font-size:34px;letter-spacing:-.5px}
+  header{border:2px solid var(--ink);background:var(--paper-2);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand{font-family:Georgia,serif;font-weight:700;font-size:32px;letter-spacing:-.5px;line-height:1.1}
   .brand b{color:var(--rust)}
-  .tagline{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--moss)}
+  .brand .by{display:block;font-family:"Courier New",monospace;font-size:12px;letter-spacing:2px;color:var(--moss);text-transform:uppercase;margin-top:4px}
+  .head-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .tagline{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--moss);max-width:220px;text-align:right}
+  .lang{display:flex;border:1.5px solid var(--ink)}
+  .lang button{font-family:"Courier New",monospace;font-size:12px;padding:6px 10px;border:0;background:transparent;cursor:pointer;letter-spacing:1px}
+  .lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 
-  /* ---- Landing grid ---- */
   .lead{margin:24px 2px 18px;font-size:13px;color:var(--moss);letter-spacing:1px}
   .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-  .card-tool{
-    border:2px solid var(--ink);background:var(--paper-2);padding:0;text-align:left;
-    cursor:pointer;display:flex;flex-direction:column;box-shadow:4px 4px 0 var(--ink);
-    transition:transform .08s,box-shadow .08s;font-family:inherit;
-  }
+  .card-tool{border:2px solid var(--ink);background:var(--paper-2);text-align:left;cursor:pointer;display:flex;flex-direction:column;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s;font-family:inherit}
   .card-tool:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
   .card-tool:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
   .card-tool[disabled]{opacity:.5;cursor:not-allowed;box-shadow:4px 4px 0 var(--line)}
@@ -42,10 +44,10 @@
   .card-ico{font-size:26px;line-height:1}
   .card-body{padding:14px 16px 16px}
   .card-body h3{font-family:Georgia,serif;font-size:19px;margin-bottom:6px}
-  .card-body p{font-size:12px;line-height:1.55;color:var(--moss)}
+  html[lang="ja"] .card-body h3,html[lang="ja"] .brand,html[lang="ja"] .panel-head h2,html[lang="ja"] .drop .big{font-family:"Hiragino Mincho ProN","Yu Mincho",serif}
+  .card-body p{font-size:12px;line-height:1.55;color:var(--moss);min-height:34px}
   .card-tag{margin-top:12px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--rust)}
 
-  /* ---- Tool view ---- */
   .view{display:none}
   .view.active{display:block}
   .landing.hidden{display:none}
@@ -59,13 +61,13 @@
   .panel-head .meta{font-size:12px;color:var(--moss);letter-spacing:1px}
   .panel-body{padding:20px}
 
-  .controls{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  .controls{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
   .ctrl{display:flex;flex-direction:column;gap:6px;font-size:12px}
   .ctrl label{letter-spacing:1px;text-transform:uppercase;color:var(--moss)}
-  select{border:1.5px solid var(--ink);background:var(--paper);padding:6px 8px;font-size:13px;font-family:inherit}
+  select,input[type=text],input[type=number]{border:1.5px solid var(--ink);background:var(--paper);padding:6px 8px;font-size:13px;font-family:inherit}
   input[type=range]{accent-color:var(--rust)}
   .qual{display:flex;align-items:center;gap:10px}
-  .qual output{font-weight:700;color:var(--rust);min-width:34px;text-align:right}
+  .qual output{font-weight:700;color:var(--rust);min-width:44px;text-align:right}
 
   .drop{border:2px dashed var(--line);background:var(--paper);padding:38px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
   .drop:hover,.drop.over{border-color:var(--rust);background:#efe9da}
@@ -76,20 +78,21 @@
 
   .queue{margin-top:18px;display:none}
   .qhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:12px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+  .qhead .ql{display:flex;gap:6px;align-items:center}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
   .card{border:1.5px solid var(--ink);background:var(--paper);overflow:hidden;position:relative}
-  .thumb{height:84px;background:
-    repeating-conic-gradient(#c9bfa6 0% 25%,#d8cfba 0% 50%) 50%/16px 16px;
-    display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .thumb{height:84px;background:repeating-conic-gradient(#c9bfa6 0% 25%,#d8cfba 0% 50%) 50%/16px 16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .card .info{padding:6px 8px;font-size:11px;line-height:1.45}
   .card .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .card .size{color:var(--moss)}
+  .card .size .arr{color:var(--rust)}
   .card .x{position:absolute;top:4px;right:4px;width:20px;height:20px;border:1px solid var(--ink);background:var(--paper);font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .card .x:hover{background:var(--rust);color:var(--paper)}
   .card .state{position:absolute;top:4px;left:4px;font-size:9px;padding:2px 5px;letter-spacing:1px;background:var(--moss);color:var(--paper)}
   .card .state.working{background:var(--rust)}
   .card .state.done{background:var(--ink)}
+  .card .state.fail{background:#7a1f1f}
 
   .actions{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
   button.go{font-family:inherit;font-size:14px;letter-spacing:1px;text-transform:uppercase;border:2px solid var(--ink);background:var(--rust);color:var(--paper);padding:11px 22px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s,background .12s}
@@ -102,142 +105,227 @@
   .stat b{color:var(--rust)}
   .note{margin-top:14px;font-size:11px;color:var(--moss);line-height:1.6;border-left:3px solid var(--line);padding-left:12px}
 
-  footer{margin-top:30px;font-size:11px;color:var(--moss);letter-spacing:1px;text-align:center}
-  @media(max-width:520px){.brand{font-size:26px}.panel-head h2{font-size:19px}}
+  .qr-wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .qr-form{flex:1 1 260px;display:flex;flex-direction:column;gap:14px}
+  .qr-form input[type=text]{width:100%}
+  .qr-row{display:flex;gap:14px;flex-wrap:wrap}
+  .qr-preview{flex:0 0 auto;border:1.5px solid var(--ink);background:#fff;padding:16px;display:flex;align-items:center;justify-content:center;min-width:200px;min-height:200px}
+  .qr-preview canvas{display:block;max-width:100%;height:auto}
+  .qr-empty{font-size:12px;color:var(--moss)}
+  .swatch{display:flex;align-items:center;gap:8px}
+  input[type=color]{width:38px;height:32px;border:1.5px solid var(--ink);background:var(--paper);padding:2px;cursor:pointer}
+
+  footer{margin-top:30px;font-size:11px;color:var(--moss);letter-spacing:1px;text-align:center;line-height:1.7}
+  @media(max-width:520px){.brand{font-size:26px}.panel-head h2{font-size:19px}.tagline{text-align:left;max-width:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div>
-      <div class="brand">The <b>Bench</b></div>
-      <div class="tagline">A workshop of small tools</div>
+    <div><div class="brand">The <b>Bench</b><span class="by" data-t="by">by Supula</span></div></div>
+    <div class="head-right">
+      <div class="tagline" data-t="tagline">No upload · your files stay on your device</div>
+      <div class="lang" role="group" aria-label="Language">
+        <button data-lang="en" aria-pressed="true">EN</button>
+        <button data-lang="ja" aria-pressed="false">日本語</button>
+      </div>
     </div>
-    <div class="tagline">No&nbsp;upload · runs&nbsp;in&nbsp;your&nbsp;browser</div>
   </header>
 
-  <!-- LANDING -->
   <div class="landing" id="landing">
-    <p class="lead">Pick a tool. Everything runs locally — your files never leave this page.</p>
+    <p class="lead" data-t="lead">Pick a tool. Everything runs in your browser — your files are never uploaded to a server.</p>
     <div class="cards">
       <button class="card-tool" data-open="img">
         <div class="card-top"><span class="card-no">TOOL 01</span><span class="card-ico">🖼</span></div>
-        <div class="card-body">
-          <h3>Image → WebP</h3>
-          <p>Convert PNG, JPG or GIF to WebP (or JPEG/PNG). Batch up to 30, download one zip.</p>
-          <div class="card-tag">Batch · Zip</div>
-        </div>
+        <div class="card-body"><h3 data-t="t1_h">Image → WebP</h3><p data-t="t1_p"></p><div class="card-tag" data-t="t1_tag"></div></div>
       </button>
-
+      <button class="card-tool" data-open="resize">
+        <div class="card-top"><span class="card-no">TOOL 02</span><span class="card-ico">📐</span></div>
+        <div class="card-body"><h3 data-t="t2_h">Image Resizer</h3><p data-t="t2_p"></p><div class="card-tag" data-t="t2_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="compress">
+        <div class="card-top"><span class="card-no">TOOL 03</span><span class="card-ico">🗜</span></div>
+        <div class="card-body"><h3 data-t="t3_h">Image Compressor</h3><p data-t="t3_p"></p><div class="card-tag" data-t="t3_tag"></div></div>
+      </button>
+      <button class="card-tool" data-open="qr">
+        <div class="card-top"><span class="card-no">TOOL 04</span><span class="card-ico">▦</span></div>
+        <div class="card-body"><h3 data-t="t4_h">QR Code Generator</h3><p data-t="t4_p"></p><div class="card-tag" data-t="t4_tag"></div></div>
+      </button>
       <button class="card-tool" data-open="bg">
-        <div class="card-top"><span class="card-no">TOOL 02</span><span class="card-ico">✂️</span></div>
-        <div class="card-body">
-          <h3>Background Remover</h3>
-          <p>AI cutout to transparent PNG, right in the browser. Batch up to 20, download one zip.</p>
-          <div class="card-tag">AI · Offline after load</div>
-        </div>
+        <div class="card-top"><span class="card-no">TOOL 05</span><span class="card-ico">✂️</span></div>
+        <div class="card-body"><h3 data-t="t5_h">Background Remover</h3><p data-t="t5_p"></p><div class="card-tag" data-t="t5_tag"></div></div>
       </button>
-
       <button class="card-tool" disabled>
-        <div class="card-top"><span class="card-no">TOOL 03</span><span class="card-ico">＋</span></div>
-        <div class="card-body">
-          <h3>Coming next</h3>
-          <p>Room for more. Resize, compress, crop, favicon maker — your call.</p>
-          <div class="card-tag">Planned</div>
-        </div>
+        <div class="card-top"><span class="card-no">TOOL 06</span><span class="card-ico">＋</span></div>
+        <div class="card-body"><h3 data-t="t6_h">Coming next</h3><p data-t="t6_p"></p><div class="card-tag" data-t="t6_tag"></div></div>
       </button>
     </div>
   </div>
 
-  <!-- TOOL 01: WEBP -->
+  <!-- WEBP -->
   <div class="view" id="view-img">
-    <div class="backbar"><button class="back" data-back>← All tools</button></div>
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
     <section class="panel">
-      <div class="panel-head"><h2>Image to WebP</h2><div class="meta">PNG · JPG · GIF → WEBP</div></div>
+      <div class="panel-head"><h2 data-t="t1_h">Image to WebP</h2><div class="meta">PNG · JPG · GIF → WEBP</div></div>
       <div class="panel-body">
         <div class="controls">
-          <div class="ctrl"><label for="fmt">Output</label>
-            <select id="fmt">
-              <option value="image/webp" selected>WebP</option>
-              <option value="image/jpeg">JPEG</option>
-              <option value="image/png">PNG</option>
-            </select>
-          </div>
-          <div class="ctrl"><label for="q">Quality</label>
-            <div class="qual"><input type="range" id="q" min="10" max="100" value="80" step="5"><output id="qv">80</output></div>
-          </div>
+          <div class="ctrl"><label data-t="l_output">Output</label><select id="fmt"><option value="image/webp" selected>WebP</option><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option></select></div>
+          <div class="ctrl"><label data-t="l_quality">Quality</label><div class="qual"><input type="range" id="q" min="10" max="100" value="80" step="5"><output id="qv">80</output></div></div>
         </div>
-        <div class="drop" id="drop-img" tabindex="0" role="button" aria-label="Add images">
-          <div class="big">Drop images here</div>
-          <div class="sub">or click / tap to choose files</div>
-          <div class="cap">Up to <b>30</b> images · downloaded as one <b>.zip</b></div>
-          <input type="file" id="file-img" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" multiple hidden>
-        </div>
-        <div class="queue" id="queue-img">
-          <div class="qhead"><span>Queue · <span id="count-img">0</span>/30</span><button class="ghost" id="clear-img">Clear all</button></div>
-          <div class="grid" id="grid-img"></div>
-        </div>
-        <div class="actions"><button class="go" id="run-img" disabled>Convert &amp; download .zip</button><span class="stat" id="stat-img"></span></div>
+        <div class="drop" id="drop-img" tabindex="0" role="button"><div class="big" data-t="drop_big">Drop images here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="upto">Up to</span> <b>30</b> · <span data-t="one_zip">one .zip</span></div><input type="file" id="file-img" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" multiple hidden></div>
+        <div class="queue" id="queue-img"><div class="qhead"><span class="ql"><span data-t="queue">Queue</span> · <span id="count-img">0</span>/30</span><button class="ghost" id="clear-img" data-t="clear">Clear all</button></div><div class="grid" id="grid-img"></div></div>
+        <div class="actions"><button class="go" id="run-img" disabled data-t="run_webp">Convert &amp; download .zip</button><span class="stat" id="stat-img"></span></div>
       </div>
     </section>
   </div>
 
-  <!-- TOOL 02: BACKGROUND REMOVER -->
-  <div class="view" id="view-bg">
-    <div class="backbar"><button class="back" data-back>← All tools</button></div>
+  <!-- RESIZE -->
+  <div class="view" id="view-resize">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
     <section class="panel">
-      <div class="panel-head"><h2>Background Remover</h2><div class="meta">AI cutout → transparent PNG</div></div>
+      <div class="panel-head"><h2 data-t="t2_h">Image Resizer</h2><div class="meta" data-t="keep_ratio">Keeps aspect ratio</div></div>
       <div class="panel-body">
-        <div class="drop" id="drop-bg" tabindex="0" role="button" aria-label="Add images">
-          <div class="big">Drop images here</div>
-          <div class="sub">or click / tap to choose files</div>
-          <div class="cap">Up to <b>20</b> images · downloaded as one <b>.zip</b></div>
-          <input type="file" id="file-bg" accept="image/png,image/jpeg,image/webp" multiple hidden>
+        <div class="controls">
+          <div class="ctrl"><label data-t="l_mode">Resize by</label><select id="rz-mode"><option value="width">Width</option><option value="height">Height</option><option value="percent">Percent</option></select></div>
+          <div class="ctrl"><label id="rz-vlabel" data-t="l_width_px">Width (px)</label><input type="number" id="rz-value" value="800" min="1" style="width:110px"></div>
+          <div class="ctrl"><label data-t="l_output">Output</label><select id="rz-fmt"><option value="source" data-t="opt_keep">Keep format</option><option value="image/webp">WebP</option><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option></select></div>
         </div>
-        <div class="queue" id="queue-bg">
-          <div class="qhead"><span>Queue · <span id="count-bg">0</span>/20</span><button class="ghost" id="clear-bg">Clear all</button></div>
-          <div class="grid" id="grid-bg"></div>
-        </div>
-        <div class="actions"><button class="go" id="run-bg" disabled>Remove backgrounds</button><span class="stat" id="stat-bg"></span></div>
-        <p class="note">First run downloads a one-time AI model (~40&nbsp;MB), then it's cached and works offline. Processing happens entirely on your device. Best with clear subjects — people, products, animals.</p>
+        <div class="drop" id="drop-resize" tabindex="0" role="button"><div class="big" data-t="drop_big">Drop images here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="upto">Up to</span> <b>30</b> · <span data-t="one_zip">one .zip</span></div><input type="file" id="file-resize" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" multiple hidden></div>
+        <div class="queue" id="queue-resize"><div class="qhead"><span class="ql"><span data-t="queue">Queue</span> · <span id="count-resize">0</span>/30</span><button class="ghost" id="clear-resize" data-t="clear">Clear all</button></div><div class="grid" id="grid-resize"></div></div>
+        <div class="actions"><button class="go" id="run-resize" disabled data-t="run_resize">Resize &amp; download .zip</button><span class="stat" id="stat-resize"></span></div>
       </div>
     </section>
   </div>
 
-  <footer>The Bench · files are processed locally and never uploaded.</footer>
+  <!-- COMPRESS -->
+  <div class="view" id="view-compress">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t3_h">Image Compressor</h2><div class="meta">JPG · WEBP</div></div>
+      <div class="panel-body">
+        <div class="controls">
+          <div class="ctrl"><label data-t="l_output">Output</label><select id="cp-fmt"><option value="image/jpeg" selected>JPEG</option><option value="image/webp">WebP</option></select></div>
+          <div class="ctrl"><label data-t="l_quality">Quality</label><div class="qual"><input type="range" id="cp-q" min="10" max="95" value="65" step="5"><output id="cp-qv">65</output></div></div>
+        </div>
+        <div class="drop" id="drop-compress" tabindex="0" role="button"><div class="big" data-t="drop_big">Drop images here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="upto">Up to</span> <b>30</b> · <span data-t="one_zip">one .zip</span></div><input type="file" id="file-compress" accept="image/png,image/jpeg,image/webp,image/bmp" multiple hidden></div>
+        <div class="queue" id="queue-compress"><div class="qhead"><span class="ql"><span data-t="queue">Queue</span> · <span id="count-compress">0</span>/30</span><button class="ghost" id="clear-compress" data-t="clear">Clear all</button></div><div class="grid" id="grid-compress"></div></div>
+        <div class="actions"><button class="go" id="run-compress" disabled data-t="run_compress">Compress &amp; download .zip</button><span class="stat" id="stat-compress"></span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- QR -->
+  <div class="view" id="view-qr">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t4_h">QR Code Generator</h2><div class="meta" data-t="qr_meta">Text or link → QR</div></div>
+      <div class="panel-body">
+        <div class="qr-wrap">
+          <div class="qr-form">
+            <div class="ctrl"><label data-t="l_qtext">Text or URL</label><input type="text" id="qr-text" placeholder="https://example.com" value="https://github.com"></div>
+            <div class="qr-row">
+              <div class="ctrl"><label data-t="l_size">Size (px)</label><input type="number" id="qr-size" value="256" min="64" max="1024" step="32" style="width:100px"></div>
+              <div class="ctrl"><label data-t="l_fg">Dark</label><div class="swatch"><input type="color" id="qr-fg" value="#16140f"></div></div>
+              <div class="ctrl"><label data-t="l_bg">Light</label><div class="swatch"><input type="color" id="qr-bg" value="#ffffff"></div></div>
+            </div>
+            <div class="actions" style="margin-top:4px"><button class="go" id="qr-png" data-t="dl_png">Download PNG</button><button class="ghost" id="qr-svg" data-t="dl_svg">Download SVG</button></div>
+            <span class="stat" id="stat-qr"></span>
+          </div>
+          <div class="qr-preview" id="qr-preview"><span class="qr-empty" data-t="qr_empty">Type something to generate</span></div>
+        </div>
+        <p class="note" data-t="qr_note">Longer text makes a denser code that's harder to scan. Keep good contrast for reliable scanning.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- BG -->
+  <div class="view" id="view-bg">
+    <div class="backbar"><button class="back" data-back data-t="back">← All tools</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2 data-t="t5_h">Background Remover</h2><div class="meta" data-t="bg_meta">AI cutout → transparent PNG</div></div>
+      <div class="panel-body">
+        <div class="drop" id="drop-bg" tabindex="0" role="button"><div class="big" data-t="drop_big">Drop images here</div><div class="sub" data-t="drop_sub">or click / tap to choose files</div><div class="cap"><span data-t="upto">Up to</span> <b>20</b> · <span data-t="one_zip">one .zip</span></div><input type="file" id="file-bg" accept="image/png,image/jpeg,image/webp" multiple hidden></div>
+        <div class="queue" id="queue-bg"><div class="qhead"><span class="ql"><span data-t="queue">Queue</span> · <span id="count-bg">0</span>/20</span><button class="ghost" id="clear-bg" data-t="clear">Clear all</button></div><div class="grid" id="grid-bg"></div></div>
+        <div class="actions"><button class="go" id="run-bg" disabled data-t="run_bg">Remove backgrounds</button><span class="stat" id="stat-bg"></span></div>
+        <p class="note" data-t="bg_note">First run downloads a one-time AI model (~40 MB), then it's cached and works offline. Image processing happens entirely on your device — nothing is uploaded. Best with clear subjects: people, products, animals.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer><span data-t="foot">The Bench by Supula · files are processed in your browser, not uploaded.</span></footer>
 </div>
 
 <script type="module">
-/* ---------- Routing ---------- */
-const landing = document.getElementById('landing');
-const views = { img: document.getElementById('view-img'), bg: document.getElementById('view-bg') };
-function openTool(id){
-  landing.classList.add('hidden');
-  Object.values(views).forEach(v=>v.classList.remove('active'));
-  views[id].classList.add('active');
-  location.hash = id;
-  window.scrollTo({top:0,behavior:'smooth'});
+const I18N={
+  en:{
+    by:"by Supula", tagline:"No upload · your files stay on your device",
+    lead:"Pick a tool. Everything runs in your browser — your files are never uploaded to a server.",
+    back:"← All tools", queue:"Queue", clear:"Clear all", upto:"Up to", one_zip:"one .zip",
+    l_output:"Output", l_quality:"Quality", l_mode:"Resize by", l_width_px:"Width (px)", l_height_px:"Height (px)", l_percent:"Percent (%)",
+    opt_keep:"Keep format", keep_ratio:"Keeps aspect ratio", drop_big:"Drop images here", drop_sub:"or click / tap to choose files",
+    t1_h:"Image → WebP", t1_p:"Convert PNG, JPG or GIF to WebP (or JPEG/PNG). Batch up to 30, download one zip.", t1_tag:"Batch · Zip · Offline",
+    t2_h:"Image Resizer", t2_p:"Resize by width, height or percent, keeping aspect ratio. Batch up to 30, one zip.", t2_tag:"Batch · Zip · Offline",
+    t3_h:"Image Compressor", t3_p:"Shrink file size with a quality slider. See how much you saved. Batch, one zip.", t3_tag:"Batch · Zip · Offline",
+    t4_h:"QR Code Generator", t4_p:"Turn any text or link into a QR code. Pick colors and size, download PNG or SVG.", t4_tag:"Instant · Offline",
+    t5_h:"Background Remover", t5_p:"AI cutout to transparent PNG, in your browser. Batch up to 20, download one zip.", t5_tag:"AI · One-time model load",
+    t6_h:"Coming next", t6_p:"Room for more. Crop, favicon maker, color picker — your call.", t6_tag:"Planned",
+    run_webp:"Convert & download .zip", run_resize:"Resize & download .zip", run_compress:"Compress & download .zip", run_bg:"Remove backgrounds",
+    qr_meta:"Text or link → QR", l_qtext:"Text or URL", l_size:"Size (px)", l_fg:"Dark", l_bg:"Light",
+    dl_png:"Download PNG", dl_svg:"Download SVG", qr_empty:"Type something to generate",
+    qr_note:"Longer text makes a denser code that's harder to scan. Keep good contrast for reliable scanning.",
+    bg_meta:"AI cutout → transparent PNG",
+    bg_note:"First run downloads a one-time AI model (~40 MB), then it's cached and works offline. Image processing happens entirely on your device — nothing is uploaded. Best with clear subjects: people, products, animals.",
+    foot:"The Bench by Supula · files are processed in your browser, not uploaded."
+  },
+  ja:{
+    by:"制作 Supula", tagline:"アップロードなし · ファイルは端末内に留まります",
+    lead:"ツールを選んでください。すべてブラウザ内で動作し、ファイルがサーバーに送信されることはありません。",
+    back:"← ツール一覧", queue:"キュー", clear:"すべて消去", upto:"最大", one_zip:"zip 1つ",
+    l_output:"出力形式", l_quality:"画質", l_mode:"基準", l_width_px:"幅 (px)", l_height_px:"高さ (px)", l_percent:"割合 (%)",
+    opt_keep:"元の形式", keep_ratio:"縦横比を維持", drop_big:"ここに画像をドロップ", drop_sub:"またはクリック / タップして選択",
+    t1_h:"画像 → WebP", t1_p:"PNG・JPG・GIF を WebP（または JPEG/PNG）に変換。最大30枚、zip 1つでダウンロード。", t1_tag:"一括 · Zip · オフライン",
+    t2_h:"画像リサイズ", t2_p:"幅・高さ・割合でリサイズ、縦横比を維持。最大30枚、zip 1つ。", t2_tag:"一括 · Zip · オフライン",
+    t3_h:"画像圧縮", t3_p:"画質スライダーでファイルを軽量化。削減率も表示。一括、zip 1つ。", t3_tag:"一括 · Zip · オフライン",
+    t4_h:"QRコード生成", t4_p:"テキストやリンクをQRコードに。色とサイズを選び、PNGかSVGで保存。", t4_tag:"即時 · オフライン",
+    t5_h:"背景除去", t5_p:"AIでブラウザ内で透過PNGに切り抜き。最大20枚、zip 1つ。", t5_tag:"AI · モデル初回読込",
+    t6_h:"近日追加", t6_p:"まだ余白あり。切り抜き、ファビコン作成、カラーピッカーなど。", t6_tag:"予定",
+    run_webp:"変換して .zip をDL", run_resize:"リサイズして .zip をDL", run_compress:"圧縮して .zip をDL", run_bg:"背景を除去",
+    qr_meta:"テキスト/リンク → QR", l_qtext:"テキストまたはURL", l_size:"サイズ (px)", l_fg:"前景色", l_bg:"背景色",
+    dl_png:"PNG をダウンロード", dl_svg:"SVG をダウンロード", qr_empty:"入力すると生成されます",
+    qr_note:"文字数が多いほどコードが密になり読み取りにくくなります。コントラストを保つと安定して読めます。",
+    bg_meta:"AI切り抜き → 透過PNG",
+    bg_note:"初回はAIモデル（約40MB）を一度だけダウンロードし、以降はキャッシュされオフラインで動作します。画像処理はすべて端末内で行われ、アップロードはされません。人物・商品・動物など被写体が明確な画像に最適です。",
+    foot:"The Bench by Supula · ファイルはブラウザ内で処理され、アップロードされません。"
+  }
+};
+let LANG='en';
+const vlabelKey={width:'l_width_px',height:'l_height_px',percent:'l_percent'};
+function applyLang(l){
+  LANG=l; document.documentElement.lang=l;
+  const d=I18N[l];
+  document.querySelectorAll('[data-t]').forEach(el=>{const k=el.dataset.t;if(d[k]!=null)el.textContent=d[k];});
+  const rzMode=document.getElementById('rz-mode');
+  if(rzMode)document.getElementById('rz-vlabel').textContent=d[vlabelKey[rzMode.value]];
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));
+  if(window.__qrRender)window.__qrRender();
 }
-function goHome(){
-  landing.classList.remove('hidden');
-  Object.values(views).forEach(v=>v.classList.remove('active'));
-  location.hash = '';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>applyLang(b.dataset.lang)));
+
+const landing=document.getElementById('landing');
+const views={img:'view-img',resize:'view-resize',compress:'view-compress',qr:'view-qr',bg:'view-bg'};
+function openTool(id){landing.classList.add('hidden');Object.values(views).forEach(v=>document.getElementById(v).classList.remove('active'));document.getElementById(views[id]).classList.add('active');location.hash=id;scrollTo({top:0,behavior:'smooth'});}
+function goHome(){landing.classList.remove('hidden');Object.values(views).forEach(v=>document.getElementById(v).classList.remove('active'));location.hash='';scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openTool(b.dataset.open)));
 document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',goHome));
-if(location.hash && views[location.hash.slice(1)]) openTool(location.hash.slice(1));
 
-/* ---------- Shared helpers ---------- */
-const fmtBytes = b => b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
+const fmtBytes=b=>b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
+function loadImg(file){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file);});}
 
 function makeQueue(cfg){
-  let items=[], uid=0;
-  const grid=document.getElementById(cfg.grid), queue=document.getElementById(cfg.queue),
-        countEl=document.getElementById(cfg.count), runBtn=document.getElementById(cfg.run),
-        stat=document.getElementById(cfg.stat), drop=document.getElementById(cfg.drop),
-        input=document.getElementById(cfg.input), clearBtn=document.getElementById(cfg.clear);
-
+  let items=[],uid=0;
+  const g=id=>document.getElementById(id);
+  const grid=g(cfg.grid),queue=g(cfg.queue),countEl=g(cfg.count),runBtn=g(cfg.run),stat=g(cfg.stat),drop=g(cfg.drop),input=g(cfg.input),clearBtn=g(cfg.clear);
   drop.addEventListener('click',()=>input.click());
   drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
   input.addEventListener('change',e=>{add(e.target.files);input.value='';});
@@ -245,108 +333,89 @@ function makeQueue(cfg){
   ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
   drop.addEventListener('drop',e=>add(e.dataTransfer.files));
   clearBtn.addEventListener('click',()=>{items.forEach(i=>URL.revokeObjectURL(i.url));items=[];render();flash('');});
-
-  function add(list){
-    const imgs=[...list].filter(f=>f.type.startsWith('image/'));
-    let added=0,skip=0;
-    for(const f of imgs){
-      if(items.length>=cfg.max){skip++;continue;}
-      items.push({id:++uid,file:f,url:URL.createObjectURL(f),state:null});added++;
-    }
-    render();
-    flash(skip?`Added ${added}. Limit ${cfg.max} — ${skip} skipped.`:added?`Added ${added} image${added>1?'s':''}.`:'');
-  }
+  function add(list){const imgs=[...list].filter(f=>f.type.startsWith('image/'));let a=0,s=0;
+    for(const f of imgs){if(items.length>=cfg.max){s++;continue;}items.push({id:++uid,file:f,url:URL.createObjectURL(f),state:null,newSize:null});a++;}
+    render();flash(s?`+${a} · max ${cfg.max}, ${s} skipped`:a?`+${a}`:'');}
   function remove(id){const it=items.find(i=>i.id===id);if(it)URL.revokeObjectURL(it.url);items=items.filter(i=>i.id!==id);render();}
-  function render(){
-    countEl.textContent=items.length;
-    queue.style.display=items.length?'block':'none';
-    runBtn.disabled=items.length===0;
-    grid.innerHTML='';
-    for(const it of items){
-      const card=document.createElement('div');card.className='card';
+  function render(){countEl.textContent=items.length;queue.style.display=items.length?'block':'none';runBtn.disabled=items.length===0;grid.innerHTML='';
+    for(const it of items){const c=document.createElement('div');c.className='card';
       const badge=it.state?`<div class="state ${it.state}">${it.state}</div>`:'';
-      card.innerHTML=`<div class="thumb"><img src="${it.url}" alt=""></div>${badge}
-        <div class="x" title="Remove">✕</div>
-        <div class="info"><div class="name">${it.file.name}</div><div class="size">${fmtBytes(it.file.size)}</div></div>`;
-      card.querySelector('.x').addEventListener('click',()=>remove(it.id));
-      grid.appendChild(card);
-    }
-  }
+      const size=it.newSize!=null?`${fmtBytes(it.file.size)} <span class="arr">→</span> ${fmtBytes(it.newSize)}`:fmtBytes(it.file.size);
+      c.innerHTML=`<div class="thumb"><img src="${it.url}" alt=""></div>${badge}<div class="x">✕</div><div class="info"><div class="name">${it.file.name}</div><div class="size">${size}</div></div>`;
+      c.querySelector('.x').addEventListener('click',()=>remove(it.id));grid.appendChild(c);}}
   function flash(m){stat.innerHTML=m;}
-  return {getItems:()=>items,render,flash,runBtn,setState:(id,s)=>{const it=items.find(i=>i.id===id);if(it){it.state=s;render();}},lock:v=>{runBtn.disabled=v;clearBtn.disabled=v;}};
+  return {get:()=>items,render,flash,runBtn,lock:v=>{runBtn.disabled=v;clearBtn.disabled=v;},
+    setState:(id,s)=>{const it=items.find(i=>i.id===id);if(it){it.state=s;render();}},
+    setSize:(id,n)=>{const it=items.find(i=>i.id===id);if(it)it.newSize=n;}};
 }
+async function canvasBlob(img,w,h,type,quality){const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');
+  if(type==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);}ctx.imageSmoothingQuality='high';ctx.drawImage(img,0,0,w,h);
+  return new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(),type,quality));}
+const extOf=m=>({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'})[m]||'img';
+function uniqueName(used,base,ext){let n=`${base}.${ext}`;if(used[n]){used[n]++;n=`${base}-${used[n]}.${ext}`;}else used[n]=1;return n;}
 
-/* ---------- Tool 01: WebP ---------- */
-(()=>{
-  const q=makeQueue({grid:'grid-img',queue:'queue-img',count:'count-img',run:'run-img',stat:'stat-img',drop:'drop-img',input:'file-img',clear:'clear-img',max:30});
-  const fmtSel=document.getElementById('fmt'),qSlider=document.getElementById('q'),qOut=document.getElementById('qv');
-  qSlider.addEventListener('input',()=>qOut.textContent=qSlider.value);
-  const extFor=m=>({'image/webp':'webp','image/jpeg':'jpg','image/png':'png'})[m]||'img';
-  function convertOne(file,type,quality){
-    return new Promise((res,rej)=>{
-      const img=new Image();
-      img.onload=()=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
-        const ctx=c.getContext('2d');
-        if(type==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
-        ctx.drawImage(img,0,0);c.toBlob(b=>b?res(b):rej(),type,quality);};
-      img.onerror=()=>rej();img.src=URL.createObjectURL(file);
-    });
-  }
-  q.runBtn.addEventListener('click',async()=>{
-    const items=q.getItems();if(!items.length)return;
-    const type=fmtSel.value,quality=parseInt(qSlider.value,10)/100,ext=extFor(type);
-    q.lock(true);const zip=new JSZip(),used={};let orig=0,neu=0,done=0;
-    for(const it of items){
-      q.flash(`Converting ${++done}/${items.length}…`);
-      try{const blob=await convertOne(it.file,type,quality);
-        let base=it.file.name.replace(/\.[^.]+$/,''),name=`${base}.${ext}`;
-        if(used[name]){used[name]++;name=`${base}-${used[name]}.${ext}`;}else used[name]=1;
-        zip.file(name,blob);orig+=it.file.size;neu+=blob.size;}catch(e){}
-    }
-    q.flash('Packing .zip…');
-    const out=await zip.generateAsync({type:'blob',compression:'STORE'});
-    dl(out,`bench-${ext}-${items.length}.zip`);
-    const saved=orig?Math.max(0,Math.round((1-neu/orig)*100)):0;
-    q.flash(`Done — <b>${items.length}</b> files · ${fmtBytes(orig)} → ${fmtBytes(neu)} (saved ${saved}%)`);
-    q.lock(false);
-  });
-})();
+/* WebP */
+(()=>{const q=makeQueue({grid:'grid-img',queue:'queue-img',count:'count-img',run:'run-img',stat:'stat-img',drop:'drop-img',input:'file-img',clear:'clear-img',max:30});
+  const fmt=document.getElementById('fmt'),sl=document.getElementById('q'),out=document.getElementById('qv');sl.oninput=()=>out.textContent=sl.value;
+  q.runBtn.addEventListener('click',async()=>{const items=q.get();if(!items.length)return;const type=fmt.value,quality=+sl.value/100,ext=extOf(type);
+    q.lock(true);const zip=new JSZip(),used={};let orig=0,neu=0,d=0;
+    for(const it of items){q.flash(`${++d}/${items.length}…`);try{const img=await loadImg(it.file);const b=await canvasBlob(img,img.naturalWidth,img.naturalHeight,type,quality);
+      zip.file(uniqueName(used,it.file.name.replace(/\.[^.]+$/,''),ext),b);q.setSize(it.id,b.size);orig+=it.file.size;neu+=b.size;}catch(e){}}
+    q.render();q.flash('zip…');const o=await zip.generateAsync({type:'blob',compression:'STORE'});dl(o,`bench-${ext}-${items.length}.zip`);
+    const s=orig?Math.max(0,Math.round((1-neu/orig)*100)):0;q.flash(`<b>${items.length}</b> · ${fmtBytes(orig)} → ${fmtBytes(neu)} (−${s}%)`);q.lock(false);});})();
 
-/* ---------- Tool 02: Background Remover ---------- */
-(()=>{
-  const q=makeQueue({grid:'grid-bg',queue:'queue-bg',count:'count-bg',run:'run-bg',stat:'stat-bg',drop:'drop-bg',input:'file-bg',clear:'clear-bg',max:20});
-  let remover=null;
-  async function loadLib(){
-    if(remover)return remover;
-    q.flash('Loading AI model…');
-    const mod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
-    remover=mod.removeBackground||mod.default;
-    return remover;
-  }
-  q.runBtn.addEventListener('click',async()=>{
-    const items=q.getItems();if(!items.length)return;
-    q.lock(true);
-    let fn;
-    try{fn=await loadLib();}catch(e){q.flash('Could not load the AI model — check your connection.');q.lock(false);return;}
-    const zip=new JSZip(),used={};let done=0,ok=0;
-    for(const it of items){
-      q.setState(it.id,'working');q.flash(`Removing ${++done}/${items.length}…`);
-      try{
-        const blob=await fn(it.file);
-        let base=it.file.name.replace(/\.[^.]+$/,''),name=`${base}-nobg.png`;
-        if(used[name]){used[name]++;name=`${base}-nobg-${used[name]}.png`;}else used[name]=1;
-        zip.file(name,blob);
-        it.url=URL.createObjectURL(blob);it.state='done';q.render();ok++;
-      }catch(e){q.setState(it.id,'fail');}
-    }
-    if(ok){q.flash('Packing .zip…');const out=await zip.generateAsync({type:'blob',compression:'STORE'});
-      dl(out,`bench-nobg-${ok}.zip`);q.flash(`Done — <b>${ok}</b> cutout${ok>1?'s':''} saved.`);}
-    else q.flash('No images could be processed.');
-    q.lock(false);
-  });
-})();
+/* Resize */
+(()=>{const q=makeQueue({grid:'grid-resize',queue:'queue-resize',count:'count-resize',run:'run-resize',stat:'stat-resize',drop:'drop-resize',input:'file-resize',clear:'clear-resize',max:30});
+  const mode=document.getElementById('rz-mode'),val=document.getElementById('rz-value'),vlab=document.getElementById('rz-vlabel'),fmt=document.getElementById('rz-fmt');
+  mode.addEventListener('change',()=>{vlab.textContent=I18N[LANG][vlabelKey[mode.value]];val.value=mode.value==='percent'?50:800;});
+  q.runBtn.addEventListener('click',async()=>{const items=q.get();if(!items.length)return;const v=Math.max(1,+val.value||1);
+    q.lock(true);const zip=new JSZip(),used={};let d=0;
+    for(const it of items){q.flash(`${++d}/${items.length}…`);try{const img=await loadImg(it.file);let w=img.naturalWidth,h=img.naturalHeight;
+      if(mode.value==='width'){h=Math.round(h*(v/w));w=v;}else if(mode.value==='height'){w=Math.round(w*(v/h));h=v;}else{w=Math.max(1,Math.round(w*v/100));h=Math.max(1,Math.round(h*v/100));}
+      const type=fmt.value==='source'?(it.file.type||'image/png'):fmt.value;const ext=extOf(type);
+      const b=await canvasBlob(img,w,h,type,type==='image/png'?undefined:0.9);
+      zip.file(uniqueName(used,it.file.name.replace(/\.[^.]+$/,'')+`-${w}x${h}`,ext),b);q.setSize(it.id,b.size);}catch(e){}}
+    q.render();q.flash('zip…');const o=await zip.generateAsync({type:'blob',compression:'STORE'});dl(o,`bench-resized-${items.length}.zip`);q.flash(`<b>${items.length}</b> ✓`);q.lock(false);});})();
 
-function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
+/* Compress */
+(()=>{const q=makeQueue({grid:'grid-compress',queue:'queue-compress',count:'count-compress',run:'run-compress',stat:'stat-compress',drop:'drop-compress',input:'file-compress',clear:'clear-compress',max:30});
+  const fmt=document.getElementById('cp-fmt'),sl=document.getElementById('cp-q'),out=document.getElementById('cp-qv');sl.oninput=()=>out.textContent=sl.value;
+  q.runBtn.addEventListener('click',async()=>{const items=q.get();if(!items.length)return;const type=fmt.value,quality=+sl.value/100,ext=extOf(type);
+    q.lock(true);const zip=new JSZip(),used={};let orig=0,neu=0,d=0;
+    for(const it of items){q.flash(`${++d}/${items.length}…`);try{const img=await loadImg(it.file);const b=await canvasBlob(img,img.naturalWidth,img.naturalHeight,type,quality);
+      zip.file(uniqueName(used,it.file.name.replace(/\.[^.]+$/,'')+'-min',ext),b);q.setSize(it.id,b.size);orig+=it.file.size;neu+=b.size;}catch(e){}}
+    q.render();q.flash('zip…');const o=await zip.generateAsync({type:'blob',compression:'STORE'});dl(o,`bench-compressed-${items.length}.zip`);
+    const s=orig?Math.max(0,Math.round((1-neu/orig)*100)):0;q.flash(`<b>${items.length}</b> · ${fmtBytes(orig)} → ${fmtBytes(neu)} (−${s}%)`);q.lock(false);});})();
+
+/* QR */
+(()=>{const text=document.getElementById('qr-text'),size=document.getElementById('qr-size'),fg=document.getElementById('qr-fg'),bg=document.getElementById('qr-bg'),preview=document.getElementById('qr-preview'),stat=document.getElementById('stat-qr');
+  let canvas=null;
+  async function render(){const t=text.value.trim();preview.innerHTML='';
+    if(!t){preview.innerHTML=`<span class="qr-empty">${I18N[LANG].qr_empty}</span>`;canvas=null;return;}
+    const px=Math.min(1024,Math.max(64,+size.value||256));canvas=document.createElement('canvas');
+    try{await QRCode.toCanvas(canvas,t,{width:px,margin:2,color:{dark:fg.value,light:bg.value},errorCorrectionLevel:'H'});preview.appendChild(canvas);stat.textContent='';}
+    catch(e){preview.innerHTML=`<span class="qr-empty">${e.message||'error'}</span>`;canvas=null;}}
+  [text,size,fg,bg].forEach(el=>el.addEventListener('input',render));
+  document.getElementById('qr-png').addEventListener('click',()=>{if(canvas)canvas.toBlob(b=>dl(b,'qr.png'));});
+  document.getElementById('qr-svg').addEventListener('click',async()=>{const t=text.value.trim();if(!t)return;
+    try{const svg=await QRCode.toString(t,{type:'svg',margin:2,color:{dark:fg.value,light:bg.value},errorCorrectionLevel:'H'});dl(new Blob([svg],{type:'image/svg+xml'}),'qr.svg');}catch(e){}});
+  window.__qrRender=render;render();})();
+
+/* Background remover */
+(()=>{const q=makeQueue({grid:'grid-bg',queue:'queue-bg',count:'count-bg',run:'run-bg',stat:'stat-bg',drop:'drop-bg',input:'file-bg',clear:'clear-bg',max:20});
+  let fn=null;
+  async function lib(){if(fn)return fn;q.flash(LANG==='ja'?'AIモデル読込中…':'Loading AI model…');
+    const m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');fn=m.removeBackground||m.default;return fn;}
+  q.runBtn.addEventListener('click',async()=>{const items=q.get();if(!items.length)return;q.lock(true);let run;
+    try{run=await lib();}catch(e){q.flash(LANG==='ja'?'モデルを読み込めませんでした。':'Could not load model.');q.lock(false);return;}
+    const zip=new JSZip(),used={};let d=0,ok=0;
+    for(const it of items){q.setState(it.id,'working');q.flash(`${++d}/${items.length}…`);
+      try{const blob=await run(it.file);zip.file(uniqueName(used,it.file.name.replace(/\.[^.]+$/,'')+'-nobg','png'),blob);
+        URL.revokeObjectURL(it.url);it.url=URL.createObjectURL(blob);it.state='done';it.newSize=blob.size;q.render();ok++;}catch(e){q.setState(it.id,'fail');}}
+    if(ok){q.flash('zip…');const o=await zip.generateAsync({type:'blob',compression:'STORE'});dl(o,`bench-nobg-${ok}.zip`);q.flash(`<b>${ok}</b> ✓`);}else q.flash('—');q.lock(false);});})();
+
+applyLang('en');
+if(location.hash&&views[location.hash.slice(1)])openTool(location.hash.slice(1));
 </script>
 </body>
 </html>
